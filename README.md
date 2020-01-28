@@ -72,23 +72,165 @@ This module comes with two classes, Vector and Matrix, available in 12 data type
 
   * Math::Libgsl::Matrix::Complex64
 
-All the following methods are available for every class, except where noted.
+All the following methods are available for the classes correspondig to each datatype, except where noted.
+
+Vector
+------
+
+### new(Int $size!) { self.bless(:$size) }
+
+### new(Int :$size!) { self.bless(:$size) }
+
+The constructor accepts one parameter: the vector's size; it can be passed as a Pair or as a single value.
+
+### get(Int:D $index! where * < $!vector.size --> Num)
+
+This method returns the value of a vector's element. It is possible to address a vector element as a Raku array element:
+
+    say $vector[1];
+
+or even:
+
+    say $vector[^10];
+
+### set(Int:D $index! where * < $!vector.size, Num(Cool)
+
+This method sets the value of a vector's element. This method can be chained. It is possible to address a vector element as a Raku array element:
+
+    $vector[1] = 3;
+
+Note that it's not possible to set a range of elements (yet). When used as a Raku array, this method can't be chained.
+
+### setall(Num(Cool))
+
+Sets all the elements of the vector to the same value. This method can be chained.
+
+### zero()
+
+Sets all the elements of the vector to zero. This method can be chained.
+
+### basis(Int:D $index! where * < $!vector.size)
+
+Sets all the elements of the vector to zero except for the element at $index, which is set to one. This method can be chained.
+
+### write(Str $filename!)
+
+Writes the vector to a file in binary form. This method can be chained.
+
+### read(Str $filename!)
+
+Reads the vector from a file in binary form. This method can be chained.
+
+### printf(Str $filename!, Str $format!)
+
+Writes the vector to a file using the specified format. This method can be chained.
+
+### scanf(Str $filename!)
+
+Reads the vector from a file containing formatted data. This method can be chained.
+
+### subvector(size_t $offset where * < $!vector.size, size_t $n)
+
+Creates a view on a subset of the vector, starting from $offset and of length $n. This method returns a new Vector object. Any operation done on this view affects the original vector as well.
+
+### subvector-stride(size_t $offset where * < $!vector.size, size_t $stride, size_t $n)
+
+Creates a view on a subset of the vector, starting from $offset and of length $n, with stride $stride. This method returns a new Vector object. Any operation done on this view affects the original vector as well.
+
+### vec-view-array(@array)
+
+This is not a method, but a sub. It creates a Vector object from the Raku array.
+
+### vec-view-array-stride(@array, size_t $stride)
+
+This is not a method, but a sub. It creates a Vector object from the Raku array, with stride $stride.
+
+### copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
+
+This method copies the vector $src into the current object. This method can be chained.
+
+### swap(Math::Libgsl::Vector $w where $!vector.size == .vector.size)
+
+This method exchanges the elements of the current vector with the ones of the vector $w. This method can be chained.
+
+### swap-elems(Int $i where * < $!vector.size, Int $j where * < $!vector.size)
+
+This method exchanges the $i-th and $j-th elements in place. This method can be chained.
+
+### reverse()
+
+This method reverses the order of the elements of the vector. This method can be chained.
+
+### add(Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+### sub(Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+### mul(Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+### div(Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+These methods perform operations on the elements of two vectors. The object on which the method is called is the one whose values are changed. All these methods can be chained.
+
+### scale(Num(Cool) $x)
+
+This method multiplies the elements of the vector by a factor $x. This method can be chained.
+
+### add-constant(Num(Cool) $x)
+
+This method add a constant to the elements of the vector. This method can be chained.
+
+### max(--> Num)
+
+### min(--> Num)
+
+These two methods return the min and max value in the vector. Not available in Math::Libgsl::Vector::Complex32 and Math::Libgsl::Vector::Complex64.
+
+### minmax(--> List)
+
+This method returns a list of two values: the min and max value in the vector. Not available in Math::Libgsl::Vector::Complex32 and Math::Libgsl::Vector::Complex64.
+
+### max-index(--> Int)
+
+### min-index(--> Int)
+
+These two methods return the index of the min and max value in the vector. Not available in Math::Libgsl::Vector::Complex32 and Math::Libgsl::Vector::Complex64.
+
+### minmax-index(--> List)
+
+This method returns a list of two values: the indices of the min and max value in the vector. Not available in Math::Libgsl::Vector::Complex32 and Math::Libgsl::Vector::Complex64.
+
+### is-null(--> Bool)
+
+### is-pos(--> Bool)
+
+### is-neg(--> Bool)
+
+### is-nonneg(--> Bool)
+
+These methods return True if all the elements of the vector are zero, strictly positive, strictly negative, or non-negative.
+
+### is-equal(Math::Libgsl::Vector $b --> Bool)
+
+This method returns True if the two vectors are equal element-wise.
+
+Matrix
+------
 
 ### new(Int $size1!, Int $size2!)
 
 ### new(Int :$size1!, Int :$size2!)
 
-The constructor accepts two parameters: the matrix's sizes; they can be passed as Pairs or as a single values.
+The constructor accepts two parameters: the matrix sizes; they can be passed as Pairs or as single values.
 
 ### get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num)
 
-This method returns the value of a matrix's element. It is possible to address a matrix element as a Raku shaped array element:
+This method returns the value of a matrix element. It is possible to address a matrix element as a Raku shaped array element:
 
     say $matrix[1;2];
 
 ### set(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Num(Cool)
 
-This method sets the value of a matrix's element. This method can be chained. It is possible to address a matrix element as a Raku shaped array element:
+This method sets the value of a matrix element. This method can be chained. It is possible to address a matrix element as a Raku shaped array element:
 
     $matrix[1;3] = 3;
 
@@ -119,54 +261,6 @@ Writes the matrix to a file using the specified format. This method can be chain
 ### scanf(Str $filename!)
 
 Reads the matrix from a file containing formatted data. This method can be chained.
-
-### submatrix(size_t $k1 where * < $!matrix.size1, size_t $k2 where * < $!matrix.size2, size_t $n1, size_t $n2)
-
-Creates a view on a subset of the matrix, starting from coordinates ($k1, $k2) with $n1 rows and $n2 columns. This method returns a new Matrix object. Any operation done on this view affects the original matrix as well.
-
-### mat-view-array(@array where { @array ~~ Array && @array.shape.elems == 2 })
-
-This is not a method, but a sub. It creates a Matrix object from the Raku shaped array.
-
-### mat-view-array-tda(@array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda)
-
-This is not a method, but a sub. It creates a Matrix object from the Raku array, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix.
-
-### mat-view-vector(Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
-
-This is not a method, but a sub. It creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
-
-### mat-view-vector-tda(Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda)
-
-This is not a method, but a sub. It creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
-
-### row-view(size_t $i where * < $!matrix.size1)
-
-This method creates a Vector object from row $i of the matrix.
-
-### col-view(size_t $j where * < $!matrix.size2)
-
-This method creates a Vector object from column $j of the matrix.
-
-### subrow-view(size_t $i where * < $!matrix.size1, size_t $offset, size_t $n)
-
-This method creates a Vector object from row $i of the matrix, starting from $offset and containing $n elements.
-
-### subcol-view(size_t $j where * < $!matrix.size2, size_t $offset, size_t $n)
-
-This method creates a Vector object from column $j of the matrix, starting from $offset and containing $n elements.
-
-### diagonal-view()
-
-This method creates a Vector object from the diagonal of the matrix.
-
-### subdiagonal-view(size_t $k where * < min($!matrix.size1, $!matrix.size2))
-
-This method creates a Vector object from the subdiagonal number $k of the matrix.
-
-### superdiagonal-view(size_t $k where * < min($!matrix.size1, $!matrix.size2))
-
-This method creates a Vector object from the superdiagonal number $k of the matrix.
 
 ### copy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2)
 
