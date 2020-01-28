@@ -1,0 +1,20 @@
+SRC=src
+
+all : lib
+
+lib : resources/libraries/%LIB-NAME%
+
+# 'all', with compilation warnings
+debug :
+	%MAKE% "DBG=-Wall -g"  all
+
+resources/libraries/%LIB-NAME% : $(SRC)/matrix%O%
+	%LD% %LDSHARED% %LDFLAGS% %LDOUT%resources/libraries/%LIB-NAME% \
+		$(SRC)/matrix%O% \
+		%LIB-LDFLAGS%
+
+%%O%: %.c
+	%CC% -I $(SRC) -c %CCSHARED% %CCFLAGS% -o $@ $< %LIB-CFLAGS% $(DBG)
+
+clean :
+	@rm -f $(SRC)/*%O% resources/libraries/*%LIB-NAME%
