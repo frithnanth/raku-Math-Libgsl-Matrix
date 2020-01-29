@@ -13,7 +13,9 @@ before_install:
   - sudo dpkg -i libgslcblas0_2.5+dfsg-6_amd64.deb libgsl23_2.5+dfsg-6_amd64.deb libgsl-dev_2.5+dfsg-6_amd64.deb
 install:
   - zef update
-  - zef install --deps-only --/test .
+  - zef install LibraryMake
+  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Constants
+  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Complex
   - zef build .
   - ls -R src resources
 script:
