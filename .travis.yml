@@ -12,8 +12,8 @@ before_install:
   - wget 'http://http.us.debian.org/debian/pool/main/g/gsl/libgsl-dev_2.5+dfsg-6_amd64.deb'
   - sudo dpkg -i libgslcblas0_2.5+dfsg-6_amd64.deb libgsl23_2.5+dfsg-6_amd64.deb libgsl-dev_2.5+dfsg-6_amd64.deb
 install:
+  - zef update
   - zef install --deps-only --/test .
-  - echo $PWD
   - zef build .
   - ls -R src resources
 script:
