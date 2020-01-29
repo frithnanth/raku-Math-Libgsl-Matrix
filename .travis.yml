@@ -14,8 +14,8 @@ before_install:
 install:
   - zef update
   - zef install LibraryMake
-  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Constants
-  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Complex
+  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Constants.git
+  - zef install git://github.com/frithnanth/raku-Math-Libgsl-Complex.git
   - zef build .
   - ls -R src resources
 script:
