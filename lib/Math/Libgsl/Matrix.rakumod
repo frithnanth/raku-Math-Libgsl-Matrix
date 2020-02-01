@@ -230,7 +230,7 @@ This package provides both the low-level interface to the C library (Raw) and a 
 
 This module comes with two classes, Vector and Matrix, available in 12 data types, so it offers 24 classes:
 
-=item Math::Libgsl::Vector              - default, corresponding to a Math::Libgsl::Vector::Num
+=item Math::Libgsl::Vector              - default, corresponding to a Math::Libgsl::Vector::Num64
 =item Math::Libgsl::Vector::Num32
 =item Math::Libgsl::Vector::Int32
 =item Math::Libgsl::Vector::UInt32
@@ -243,7 +243,7 @@ This module comes with two classes, Vector and Matrix, available in 12 data type
 =item Math::Libgsl::Vector::Complex32
 =item Math::Libgsl::Vector::Complex64
 
-=item Math::Libgsl::Matrix              - default, corresponding to a Math::Libgsl::Matrix::Num
+=item Math::Libgsl::Matrix              - default, corresponding to a Math::Libgsl::Matrix::Num64
 =item Math::Libgsl::Matrix::Num32
 =item Math::Libgsl::Matrix::Int32
 =item Math::Libgsl::Matrix::UInt32
