@@ -19,7 +19,7 @@ subtest {
   ok $v1.get(0) == 0, 'get element';
   dies-ok { $v1.get(10) }, 'get element 11 of a 10-element vector dies';
   ok $v1[0] == 0, 'get element using postcircumfix';
-  dies-ok { $v1.[10] }, 'get element 11 of a 10-element vector using postcircumfix dies';
+  dies-ok { $v1[10] }, 'get element 11 of a 10-element vector using postcircumfix dies';
   lives-ok { $v1.set(0, 10) }, 'element set lives';
   ok $v1.get(0) == 10e0, 'element set';
   dies-ok { $v1.set(10) }, 'set element 11 of a 10-element vector dies';
