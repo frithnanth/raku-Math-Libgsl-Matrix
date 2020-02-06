@@ -99,10 +99,10 @@ sub gsl_matrix_complex_float_alloc(size_t $n1, size_t $n2 --> gsl_matrix_complex
 sub gsl_matrix_complex_float_calloc(size_t $n1, size_t $n2 --> gsl_matrix_complex_float) is native(LIB) is export(:matrix) { * }
 sub gsl_matrix_complex_float_free(gsl_matrix_complex_float $m) is native(LIB) is export(:matrix) { * }
 # Accessing matrix elements
-sub mgsl_matrix_complex_float_get(gsl_matrix_complex_float $m, size_t $i, size_t $j, gsl_matrix_complex_float $res) is native(GSLHELPER) is export(:matrix) { * }
-sub mgsl_matrix_complex_float_set(gsl_matrix_complex_float $m, size_t $i, size_t $j, gsl_matrix_complex_float $x) is native(GSLHELPER) is export(:matrix) { * }
+sub mgsl_matrix_complex_float_get(gsl_matrix_complex_float $m, size_t $i, size_t $j, gsl_complex_float $res) is native(GSLHELPER) is export(:matrix) { * }
+sub mgsl_matrix_complex_float_set(gsl_matrix_complex_float $m, size_t $i, size_t $j, gsl_complex_float $x) is native(GSLHELPER) is export(:matrix) { * }
 # Initializing matrix elements
-sub mgsl_matrix_complex_float_set_all(gsl_matrix_complex_float $m, gsl_matrix_complex_float $x) is native(GSLHELPER) is export(:matrixio) { * }
+sub mgsl_matrix_complex_float_set_all(gsl_matrix_complex_float $m, gsl_complex_float $x) is native(GSLHELPER) is export(:matrixio) { * }
 sub gsl_matrix_complex_float_set_zero(gsl_matrix_complex_float $m) is native(LIB) is export(:matrixio) { * }
 sub gsl_matrix_complex_float_set_identity(gsl_matrix_complex_float $m) is native(LIB) is export(:matrixio) { * }
 # Reading and writing matrices
