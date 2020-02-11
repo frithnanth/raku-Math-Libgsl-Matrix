@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Vector::Num32:ver<0.0.2>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Vector::Num32:ver<0.0.3>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Num32 :ALL;
