@@ -70,9 +70,7 @@ method ASSIGN-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!v
 }
 method setall(Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
-  #mgsl_complex_float_rect($x.re, $x.im, $c); # doesn't exist!
-  $c.dat[0] = $x.re;
-  $c.dat[1] = $x.im;
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   mgsl_vector_complex_float_set_all($!vector, $c);
   free_gsl_complex_float($c);
   self
@@ -178,9 +176,7 @@ method div(Math::Libgsl::Vector::Complex32 $b where $!vector.size == .vector.siz
 }
 method scale(Num(Cool) $x) {
   my $c = alloc_gsl_complex_float;
-  #mgsl_complex_float_rect($x.re, $x.im, $c); # doesn't exist!
-  $c.dat[0] = $x.re;
-  $c.dat[1] = $x.im;
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_float_scale($!vector, $c);
   free_gsl_complex_float($c);
   fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
@@ -188,9 +184,7 @@ method scale(Num(Cool) $x) {
 }
 method add-constant(Num(Cool) $x) {
   my $c = alloc_gsl_complex_float;
-  #mgsl_complex_float_rect($x.re, $x.im, $c); # doesn't exist!
-  $c.dat[0] = $x.re;
-  $c.dat[1] = $x.im;
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_float_add_constant($!vector, $c);
   free_gsl_complex_float($c);
   fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to all elements" if $ret ≠ GSL_SUCCESS;

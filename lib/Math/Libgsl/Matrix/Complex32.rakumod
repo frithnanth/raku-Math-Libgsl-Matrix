@@ -38,9 +38,7 @@ method ASSIGN-POS(Math::Libgsl::Matrix::Complex32:D: Int:D $i! where * < $!matri
 }
 method setall(Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
-  #mgsl_complex_float_rect($x.re, $x.im, $c); # doesn't exist!
-  $c.dat[0] = $x.re;
-  $c.dat[1] = $x.im;
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   mgsl_matrix_complex_float_set_all($!matrix, $c);
   free_gsl_complex_float($c);
   self
