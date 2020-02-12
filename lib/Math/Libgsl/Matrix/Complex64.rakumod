@@ -24,17 +24,32 @@ submethod DESTROY {
   gsl_matrix_complex_free($!matrix);
 }
 # Accessors
-method get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num) {
-  mgsl_matrix_complex_get($!matrix, $i, $j)
+method get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Complex) {
+  my $res = alloc_gsl_complex;
+  mgsl_matrix_complex_get($!matrix, $i, $j, $res);
+  my $c = $res.dat[0] + i * $res.dat[1];
+  free_gsl_complex($res);
+  $c
 }
-method AT-POS(Math::Libgsl::Matrix::Complex64:D: Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num) {
-  mgsl_matrix_complex_get(self.matrix, $i, $j)
+method AT-POS(Math::Libgsl::Matrix::Complex64:D: Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Complex) {
+  my $res = alloc_gsl_complex;
+  mgsl_matrix_complex_get(self.matrix, $i, $j, $res);
+  my $c = $res.dat[0] + i * $res.dat[1];
+  free_gsl_complex($res);
+  $c
 }
-method set(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Num(Cool) $x!) {
-  mgsl_matrix_complex_set($!matrix, $i, $j, $x); self
+method set(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Complex(Cool) $x!) {
+  my $c = alloc_gsl_complex;
+  mgsl_complex_rect($x.re, $x.im, $c);
+  mgsl_matrix_complex_set($!matrix, $i, $j, $c);
+  free_gsl_complex($c);
+  self
 }
-method ASSIGN-POS(Math::Libgsl::Matrix::Complex64:D: Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Num(Cool) $x!) {
-  mgsl_matrix_complex_set(self.matrix, $i, $j, $x)
+method ASSIGN-POS(Math::Libgsl::Matrix::Complex64:D: Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Complex(Cool) $x!) {
+  my $c = alloc_gsl_complex;
+  mgsl_complex_rect($x.re, $x.im, $c);
+  mgsl_matrix_complex_set(self.matrix, $i, $j, $c);
+  free_gsl_complex($c)
 }
 method setall(Complex(Cool) $x!) {
   my $c = alloc_gsl_complex;
