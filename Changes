@@ -1,6 +1,9 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+0.0.4 2020-02-12T13:00:01+01:00
+    - Fix some bugs
+
 0.0.3 2020-02-11T14:05:25+01:00
     - Fix problem with Complex32
 
