@@ -30,13 +30,9 @@ submethod DESTROY {
 }
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Num) { gsl_vector_float_get($!vector, $index) }
-multi method AT-POS(Math::Libgsl::Vector::Num32:D: Int:D $index! where * < $!vector.size --> Num) {
+method AT-POS(Math::Libgsl::Vector::Num32:D: Int:D $index! where * < $!vector.size --> Num) {
   gsl_vector_float_get(self.vector, $index)
 }
-multi method AT-POS(Math::Libgsl::Vector::Num32:D: Range:D $range! where { .max < $!vector.size && .min ≥ 0 } --> List) {
-  gsl_vector_float_get(self.vector, $_) for $range
-}
-method set(Int:D $index! where * < $!vector.size, Num(Cool) $x!) { gsl_vector_float_set($!vector, $index, $x); self }
 method ASSIGN-POS(Math::Libgsl::Vector::Num32:D: Int:D $index! where * < $!vector.size, Num(Cool) $x!) {
   gsl_vector_float_set(self.vector, $index, $x)
 }

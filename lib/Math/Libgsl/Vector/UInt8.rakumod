@@ -29,18 +29,14 @@ submethod DESTROY {
   gsl_vector_uchar_free($!vector);
 }
 # Accessors
-method get(Int:D $index! where * < $!vector.size --> Num) { gsl_vector_uchar_get($!vector, $index) }
-multi method AT-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size --> Num) {
+method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_uchar_get($!vector, $index) }
+method AT-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size --> Int) {
   gsl_vector_uchar_get(self.vector, $index)
 }
-multi method AT-POS(Math::Libgsl::Vector::UInt8:D: Range:D $range! where { .max < $!vector.size && .min ≥ 0 } --> List) {
-  gsl_vector_uchar_get(self.vector, $_) for $range
-}
-method set(Int:D $index! where * < $!vector.size, Num(Cool) $x!) { gsl_vector_uchar_set($!vector, $index, $x); self }
-method ASSIGN-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size, Num(Cool) $x!) {
+method ASSIGN-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size, Int(Cool) $x!) {
   gsl_vector_uchar_set(self.vector, $index, $x)
 }
-method setall(Num(Cool) $x!) { gsl_vector_uchar_set_all($!vector, $x); self }
+method setall(Int(Cool) $x!) { gsl_vector_uchar_set_all($!vector, $x); self }
 method zero() { gsl_vector_uchar_set_zero($!vector); self }
 method basis(Int:D $index! where * < $!vector.size) {
   my $ret = gsl_vector_uchar_set_basis($!vector, $index);
@@ -81,12 +77,12 @@ fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" i
 }
 sub view-uchar-array(@array) is export {
   my Math::Libgsl::Vector::UInt8::VView $vv .= new;
-  my CArray[uint8] $a .= new: @array».Num;
+  my CArray[uint8] $a .= new: @array».Int;
   Math::Libgsl::Vector::UInt8.new: vector => mgsl_vector_uchar_view_array($vv.view, $a, @array.elems);
 }
 sub view-uchar-array-stride(@array, size_t $stride) is export {
   my Math::Libgsl::Vector::UInt8::VView $vv .= new;
-  my CArray[uint8] $a .= new: @array».Num;
+  my CArray[uint8] $a .= new: @array».Int;
   Math::Libgsl::Vector::UInt8.new: vector => mgsl_vector_uchar_view_array_with_stride($vv.view, $a, $stride, @array.elems);
 }
 # Copy
@@ -132,12 +128,12 @@ method div(Math::Libgsl::Vector::UInt8 $b where $!vector.size == .vector.size) {
   fail X::Libgsl.new: errno => $ret, error => "Can't div two vectors" if $ret ≠ GSL_SUCCESS;
   self
 }
-method scale(Num(Cool) $x) {
+method scale(Int(Cool) $x) {
   my $ret = gsl_vector_uchar_scale($!vector, $x);
   fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
   self
 }
-method add-constant(Num(Cool) $x) {
+method add-constant(Int(Cool) $x) {
   my $ret = gsl_vector_uchar_add_constant($!vector, $x);
   fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to the elements" if $ret ≠ GSL_SUCCESS;
   self

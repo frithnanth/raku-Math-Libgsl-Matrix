@@ -37,32 +37,21 @@ method get(Int:D $index! where * < $!vector.size --> Complex) {
   free_gsl_complex_float($c);
   $nc;
 }
-multi method AT-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vector.size --> Complex) {
+method AT-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vector.size --> Complex) {
   my gsl_complex_float $c = alloc_gsl_complex_float;
   mgsl_vector_complex_float_get($!vector, $index, $c);
   my Complex $nc = $c.dat[0] + i * $c.dat[1];
   free_gsl_complex_float($c);
   $nc;
 }
-multi method AT-POS(Math::Libgsl::Vector::Complex32:D: Range:D $range! where { .max < $!vector.size && .min ≥ 0 } --> List) {
-  my Complex @cv;
-  for $range {
-    my $c = alloc_gsl_complex_float;
-    mgsl_vector_complex_float_get($!vector, $_, $c);
-    my Complex $nc = $c.dat[0] + i * $c.dat[1];
-    @cv.push: $nc;
-    free_gsl_complex_float($c);
-  }
-  @cv;
-}
-method set(Int:D $index! where * < $!vector.size, Num(Cool) $x!) {
+method set(Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_float_set($!vector, $index, $c);
   free_gsl_complex_float($c);
   self
 }
-method ASSIGN-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vector.size, Num(Cool) $x!) {
+method ASSIGN-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_float_set($!vector, $index, $c);
@@ -174,7 +163,7 @@ method div(Math::Libgsl::Vector::Complex32 $b where $!vector.size == .vector.siz
   fail X::Libgsl.new: errno => $ret, error => "Can't div two vectors" if $ret ≠ GSL_SUCCESS;
   self
 }
-method scale(Num(Cool) $x) {
+method scale(Complex(Cool) $x) {
   my $c = alloc_gsl_complex_float;
   mgsl_complex_float_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_float_scale($!vector, $c);
@@ -182,7 +171,7 @@ method scale(Num(Cool) $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
   self
 }
-method add-constant(Num(Cool) $x) {
+method add-constant(Complex(Cool) $x) {
   my $c = alloc_gsl_complex_float;
   mgsl_complex_float_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_float_add_constant($!vector, $c);

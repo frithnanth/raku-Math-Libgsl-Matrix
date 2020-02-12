@@ -37,23 +37,12 @@ method get(Int:D $index! where * < $!vector.size --> Complex) {
   free_gsl_complex($c);
   $nc;
 }
-multi method AT-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size --> Complex) {
+method AT-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size --> Complex) {
   my $c = alloc_gsl_complex;
   mgsl_vector_complex_get($!vector, $index, $c);
   my Complex $nc = $c.dat[0] + i * $c.dat[1];
   free_gsl_complex($c);
   $nc;
-}
-multi method AT-POS(Math::Libgsl::Vector::Complex64:D: Range:D $range! where { .max < $!vector.size && .min ≥ 0 } --> List) {
-  my Complex @cv;
-  for $range {
-    my $c = alloc_gsl_complex;
-    mgsl_vector_complex_get($!vector, $_, $c);
-    my Complex $nc = $c.dat[0] + i * $c.dat[1];
-    @cv.push: $nc;
-    free_gsl_complex($c);
-  }
-  @cv;
 }
 method set(Int:D $index! where * < $!vector.size, Complex $x!) {
   my $c = alloc_gsl_complex;
@@ -62,7 +51,7 @@ method set(Int:D $index! where * < $!vector.size, Complex $x!) {
   free_gsl_complex($c);
   self
 }
-method ASSIGN-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size, Num(Cool) $x!) {
+method ASSIGN-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex;
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_set($!vector, $index, $c);
@@ -174,7 +163,7 @@ method div(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.siz
   fail X::Libgsl.new: errno => $ret, error => "Can't div two vectors" if $ret ≠ GSL_SUCCESS;
   self
 }
-method scale(Complex $x) {
+method scale(Complex() $x) {
   my $c = alloc_gsl_complex;
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_scale($!vector, $c);
@@ -182,7 +171,7 @@ method scale(Complex $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
   self
 }
-method add-constant(Complex $x) {
+method add-constant(Complex() $x) {
   my $c = alloc_gsl_complex;
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_add_constant($!vector, $c);
