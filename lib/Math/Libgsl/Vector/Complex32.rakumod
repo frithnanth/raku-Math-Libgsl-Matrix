@@ -46,14 +46,14 @@ method AT-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vecto
 }
 method set(Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
-  mgsl_complex_rect($x.re, $x.im, $c);
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   mgsl_vector_complex_float_set($!vector, $index, $c);
   free_gsl_complex_float($c);
   self
 }
 method ASSIGN-POS(Math::Libgsl::Vector::Complex32:D: Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex_float;
-  mgsl_complex_rect($x.re, $x.im, $c);
+  mgsl_complex_float_rect($x.re, $x.im, $c);
   mgsl_vector_complex_float_set($!vector, $index, $c);
   free_gsl_complex_float($c);
 }
