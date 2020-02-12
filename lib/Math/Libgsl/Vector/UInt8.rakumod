@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Vector::UInt8:ver<0.0.4>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Vector::UInt8:ver<0.0.5>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::UInt8 :ALL;
@@ -33,6 +33,7 @@ method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_uchar_get
 method AT-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size --> Int) {
   gsl_vector_uchar_get(self.vector, $index)
 }
+method set(Int:D $index! where * < $!vector.size, Int(Cool) $x!) { gsl_vector_uchar_set($!vector, $index, $x); self }
 method ASSIGN-POS(Math::Libgsl::Vector::UInt8:D: Int:D $index! where * < $!vector.size, Int(Cool) $x!) {
   gsl_vector_uchar_set(self.vector, $index, $x)
 }

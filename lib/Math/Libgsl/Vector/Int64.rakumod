@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Vector::Int64:ver<0.0.4>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Vector::Int64:ver<0.0.5>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Int64 :ALL;
@@ -33,6 +33,7 @@ method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_long_get(
 method AT-POS(Math::Libgsl::Vector::Int64:D: Int:D $index! where * < $!vector.size --> Int) {
   gsl_vector_long_get(self.vector, $index)
 }
+method set(Int:D $index! where * < $!vector.size, Int(Cool) $x!) { gsl_vector_long_set($!vector, $index, $x); self }
 method ASSIGN-POS(Math::Libgsl::Vector::Int64:D: Int:D $index! where * < $!vector.size, Int(Cool) $x!) {
   gsl_vector_long_set(self.vector, $index, $x)
 }
