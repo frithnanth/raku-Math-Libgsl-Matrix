@@ -1,6 +1,9 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+0.0.6 2020-02-12T17:24:19+01:00
+    - Fix Vector::Complex32.set()
+
 0.0.5 2020-02-12T15:06:54+01:00
     - Add missing methods
 
