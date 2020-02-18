@@ -9,6 +9,12 @@ use Math::Libgsl::Constants;
 use Math::Libgsl::Vector;
 use NativeCall;
 
+class MView {
+  has gsl_matrix_view $.view;
+  submethod BUILD { $!view = alloc_gsl_matrix_view }
+  submethod DESTROY { free_gsl_matrix_view($!view) }
+}
+
 has gsl_matrix $.matrix;
 
 multi method new(Int $size1!, Int $size2!)   { self.bless(:$size1, :$size2) }
@@ -60,6 +66,29 @@ method scanf(Str $filename!) {
   my $ret = mgsl_matrix_fscanf($filename, $!matrix);
   fail X::Libgsl.new: errno => $ret, error => "Can't scan the matrix" if $ret ≠ GSL_SUCCESS;
   self
+}
+# View
+method submatrix(Math::Libgsl::Matrix::MView $mv, size_t $k1 where * < $!matrix.size1, size_t $k2 where * < $!matrix.size2, size_t $n1, size_t $n2) {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "Submatrix indices out of bound"
+    if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
+  mgsl_matrix_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
+  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
+}
+sub mat-view-array(Math::Libgsl::Matrix::MView $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export {
+  my CArray[num64] $a .= new: @array.Array».Num;
+  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array($mv.view, $a, @array.shape[0], @array.shape[1]);
+}
+sub mat-view-array-tda(Math::Libgsl::Matrix::MView $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $tda < @array.shape[1];
+  my CArray[num64] $a .= new: @array.Array».Num;
+  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array_with_tda($mv.view, $a, @array.shape[0], @array.shape[1], $tda);
+}
+sub mat-view-vector(Math::Libgsl::Matrix::MView $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2) is export {
+  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_vector($mv.view, $v.vector, $n1, $n2);
+}
+sub mat-view-vector-tda(Math::Libgsl::Matrix::MView $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda) is export {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $n2 > $tda ;
+  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
