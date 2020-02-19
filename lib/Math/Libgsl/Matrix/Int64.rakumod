@@ -2,7 +2,6 @@ use v6;
 
 unit class Math::Libgsl::Matrix::Int64:ver<0.0.6>:auth<cpan:FRITH>;
 
-use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Int64 :ALL;
 use Math::Libgsl::Exception;
 use Math::Libgsl::Constants;

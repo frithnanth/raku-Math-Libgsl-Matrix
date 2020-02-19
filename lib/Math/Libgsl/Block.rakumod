@@ -2,7 +2,6 @@ use v6;
 
 unit class Math::Libgsl::Block:ver<0.0.6>:auth<cpan:FRITH>;
 
-use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix :ALL;
 use NativeCall;
 

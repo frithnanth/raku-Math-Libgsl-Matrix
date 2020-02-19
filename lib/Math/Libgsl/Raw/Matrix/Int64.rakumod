@@ -2,7 +2,6 @@ use v6;
 
 unit module Math::Libgsl::Raw::Matrix::Int64:ver<0.0.6>:auth<cpan:FRITH>;
 
-use Math::Libgsl::Raw::Complex :ALL;
 use NativeCall;
 use LibraryMake;
 
