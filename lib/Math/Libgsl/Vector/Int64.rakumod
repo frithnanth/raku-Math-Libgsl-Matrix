@@ -8,13 +8,14 @@ use Math::Libgsl::Exception;
 use Math::Libgsl::Constants;
 use NativeCall;
 
-class VView {
+class View {
   has gsl_vector_long_view $.view;
   submethod BUILD { $!view = alloc_gsl_vector_long_view }
   submethod DESTROY { free_gsl_vector_long_view($!view) }
 }
 
 has gsl_vector_long $.vector;
+has Bool            $.view = False;
 
 multi method new(Int $size!) { self.bless(:$size) }
 multi method new(Int :$size!) { self.bless(:$size) }
@@ -22,11 +23,14 @@ multi method new(gsl_vector_long :$vector!) { self.bless(:$vector) }
 
 submethod BUILD(Int :$size?, gsl_vector_long :$vector?) {
   $!vector = gsl_vector_long_calloc($size) with $size;
-  $!vector = $vector with $vector;
+  with $vector {
+    $!vector = $vector;
+    $!view   = True;
+  }
 }
 
 submethod DESTROY {
-  gsl_vector_long_free($!vector);
+  gsl_vector_long_free($!vector) unless $!view;
 }
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_long_get($!vector, $index) }
@@ -66,23 +70,19 @@ method scanf(Str $filename!) {
   self
 }
 # View
-method subvector(size_t $offset where * < $!vector.size, size_t $n) {
-fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  my Math::Libgsl::Vector::Int64::VView $vv .= new;
+method subvector(Math::Libgsl::Vector::Int64::View $vv, size_t $offset where * < $!vector.size, size_t $n) {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
   Math::Libgsl::Vector::Int64.new: vector => mgsl_vector_long_subvector($vv.view, $!vector, $offset, $n);
 }
-method subvector-stride(size_t $offset where * < $!vector.size, size_t $stride, size_t $n) {
-fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  my Math::Libgsl::Vector::Int64::VView $vv .= new;
+method subvector-stride(Math::Libgsl::Vector::Int64::View $vv, size_t $offset where * < $!vector.size, size_t $stride, size_t $n) {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
   Math::Libgsl::Vector::Int64.new: vector => mgsl_vector_long_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
 }
-sub view-long-array(@array) is export {
-  my Math::Libgsl::Vector::Int64::VView $vv .= new;
+sub view-long-array(Math::Libgsl::Vector::Int64::View $vv, @array) is export {
   my CArray[int64] $a .= new: @array».Int;
   Math::Libgsl::Vector::Int64.new: vector => mgsl_vector_long_view_array($vv.view, $a, @array.elems);
 }
-sub view-long-array-stride(@array, size_t $stride) is export {
-  my Math::Libgsl::Vector::Int64::VView $vv .= new;
+sub view-long-array-stride(Math::Libgsl::Vector::Int64::View $vv, @array, size_t $stride) is export {
   my CArray[int64] $a .= new: @array».Int;
   Math::Libgsl::Vector::Int64.new: vector => mgsl_vector_long_view_array_with_stride($vv.view, $a, $stride, @array.elems);
 }

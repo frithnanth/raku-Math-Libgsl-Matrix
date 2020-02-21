@@ -9,13 +9,14 @@ use Math::Libgsl::Constants;
 use Math::Libgsl::Vector;
 use NativeCall;
 
-class VView {
+class View {
   has gsl_vector_complex_view $.view;
   submethod BUILD { $!view = alloc_gsl_vector_complex_view }
   submethod DESTROY { free_gsl_vector_complex_view($!view) }
 }
 
 has gsl_vector_complex $.vector;
+has Bool               $.view = False;
 
 multi method new(Int $size!) { self.bless(:$size) }
 multi method new(Int :$size!) { self.bless(:$size) }
@@ -23,11 +24,14 @@ multi method new(gsl_vector_complex :$vector!) { self.bless(:$vector) }
 
 submethod BUILD(Int :$size?, gsl_vector_complex :$vector?) {
   $!vector = gsl_vector_complex_calloc($size) with $size;
-  $!vector = $vector with $vector;
+  with $vector {
+    $!vector = $vector;
+    $!view   = True;
+  }
 }
 
 submethod DESTROY {
-  gsl_vector_complex_free($!vector);
+  gsl_vector_complex_free($!vector) unless $!view;
 }
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Complex) {
@@ -92,32 +96,26 @@ method scanf(Str $filename!) {
   self
 }
 # View
-method subvector(size_t $offset where * < $!vector.size, size_t $n) {
+method subvector(Math::Libgsl::Vector::Complex64::View $vv, size_t $offset where * < $!vector.size, size_t $n) {
 fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  my Math::Libgsl::Vector::Complex64::VView $vv .= new;
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector($vv.view, $!vector, $offset, $n);
 }
-method subvector-stride(size_t $offset where * < $!vector.size, size_t $stride, size_t $n) {
+method subvector-stride(Math::Libgsl::Vector::Complex64::View $vv, size_t $offset where * < $!vector.size, size_t $stride, size_t $n) {
 fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  my Math::Libgsl::Vector::Complex64::VView $vv .= new;
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
 }
-sub view-complex64-array(@array) is export {
-  my Math::Libgsl::Vector::Complex64::VView $vv .= new;
+sub view-complex64-array(Math::Libgsl::Vector::Complex64::View $vv, @array) is export {
   my CArray[num64] $a .= new: @array».Num;
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_view_array($vv.view, $a, @array.elems);
 }
-sub view-complex64-array-stride(@array, size_t $stride) is export {
-  my Math::Libgsl::Vector::Complex64::VView $vv .= new;
+sub view-complex64-array-stride(Math::Libgsl::Vector::Complex64::View $vv, @array, size_t $stride) is export {
   my CArray[num64] $a .= new: @array».Num;
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_view_array_with_stride($vv.view, $a, $stride, @array.elems);
 }
-method complex64-real() {
-  my Math::Libgsl::Vector::VView $vv .= new;
+method complex64-real(Math::Libgsl::Vector::View $vv) {
   Math::Libgsl::Vector.new: vector => mgsl_vector_complex_real($vv.view, $!vector);
 }
-method complex64-imag() {
-  my Math::Libgsl::Vector::VView $vv .= new;
+method complex64-imag(Math::Libgsl::Vector::View $vv) {
   Math::Libgsl::Vector.new: vector => mgsl_vector_complex_imag($vv.view, $!vector);
 }
 # Copy
