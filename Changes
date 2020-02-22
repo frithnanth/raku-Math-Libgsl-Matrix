@@ -1,6 +1,10 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+0.1.0 2020-02-22T13:43:12+01:00
+    - Add Matrix views
+    - Change Vector view interface
+
 0.0.6 2020-02-12T17:24:19+01:00
     - Fix Vector::Complex32.set()
 

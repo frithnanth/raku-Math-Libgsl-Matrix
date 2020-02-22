@@ -24,7 +24,7 @@ This package provides both the low-level interface to the C library (Raw) and a 
 
 This module comes with two classes, Vector and Matrix, available in 12 data types, so it offers 24 classes:
 
-  * Math::Libgsl::Vector - default, corresponding to a Math::Libgsl::Vector::Num
+  * Math::Libgsl::Vector - default, corresponding to a Math::Libgsl::Vector::Num64
 
   * Math::Libgsl::Vector::Num32
 
@@ -48,7 +48,7 @@ This module comes with two classes, Vector and Matrix, available in 12 data type
 
   * Math::Libgsl::Vector::Complex64
 
-  * Math::Libgsl::Matrix - default, corresponding to a Math::Libgsl::Matrix::Num
+  * Math::Libgsl::Matrix - default, corresponding to a Math::Libgsl::Matrix::Num64
 
   * Math::Libgsl::Matrix::Num32
 
@@ -87,17 +87,23 @@ The constructor accepts one parameter: the vector's size; it can be passed as a 
 
 This method returns the value of a vector's element. It is possible to address a vector element as a Raku array element:
 
-    say $vector[1];
+```perl6
+say $vector[1];
+```
 
 or even:
 
-    say $vector[^10];
+```perl6
+say $vector[^10];
+```
 
 ### set(Int:D $index! where * < $!vector.size, Num(Cool)
 
 This method sets the value of a vector's element. This method can be chained. It is possible to address a vector element as a Raku array element:
 
-    $vector[1] = 3;
+```perl6
+$vector[1] = 3;
+```
 
 Note that it's not possible to set a range of elements (yet). When used as a Raku array, this method can't be chained.
 
@@ -129,21 +135,43 @@ Writes the vector to a file using the specified format. This method can be chain
 
 Reads the vector from a file containing formatted data. This method can be chained.
 
-### subvector(size_t $offset where * < $!vector.size, size_t $n)
+### subvector(Math::Libgsl::Vector::View $vv, size_t $offset where * < $!vector.size, size_t $n)
 
 Creates a view on a subset of the vector, starting from $offset and of length $n. This method returns a new Vector object. Any operation done on this view affects the original vector as well.
 
-### subvector-stride(size_t $offset where * < $!vector.size, size_t $stride, size_t $n)
+Every vector view operation works following this logic:
+
+```perl6
+use Math::Libgsl::Vector;
+
+my Math::Libgsl::Vector $v1 .= new(:size(10));          # original vector
+$v1.setall(1);
+my Math::Libgsl::Vector::View $vv .= new;               # view: an object that will contain the view information
+my Math::Libgsl::Vector $v2 = $v1.subvector($vv, 0, 3); # $v2 is the vector created from the view
+$v2.setall(12);                                         # one can operate on $v2 as it is a normal vector
+say $v1[^10]; # output: (12 12 12 1 1 1 1 1 1 1)        # but every operation will affect the original vector as well
+```
+
+### subvector-stride(Math::Libgsl::Vector::View $vv, size_t $offset where * < $!vector.size, size_t $stride, size_t $n)
 
 Creates a view on a subset of the vector, starting from $offset and of length $n, with stride $stride. This method returns a new Vector object. Any operation done on this view affects the original vector as well.
 
-### vec-view-array(@array)
+### vec-view-array(Math::Libgsl::Vector::View $vv, @array)
 
-This is not a method, but a sub. It creates a Vector object from the Raku array.
+This is not a method, but a sub. It creates a Vector object from a Raku array.
 
-### vec-view-array-stride(@array, size_t $stride)
+```perl6
+use Math::Libgsl::Vector;
 
-This is not a method, but a sub. It creates a Vector object from the Raku array, with stride $stride.
+my Math::Libgsl::Vector::View $vv .= new;
+my @array = ^10;
+my Math::Libgsl::Vector $v = vec-view-array($vv, @array);
+say $v[^10]; # output: (0 1 2 3 4 5 6 7 8 9)
+```
+
+### vec-view-array-stride(Math::Libgsl::Vector::View $vv, @array, size_t $stride)
+
+This is not a method, but a sub. It creates a Vector object from a Raku array, with stride $stride.
 
 ### copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
 
@@ -226,13 +254,17 @@ The constructor accepts two parameters: the matrix sizes; they can be passed as 
 
 This method returns the value of a matrix element. It is possible to address a matrix element as a Raku shaped array element:
 
-    say $matrix[1;2];
+```perl6
+say $matrix[1;2];
+```
 
 ### set(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2, Num(Cool)
 
 This method sets the value of a matrix element. This method can be chained. It is possible to address a matrix element as a Raku shaped array element:
 
-    $matrix[1;3] = 3;
+```perl6
+$matrix[1;3] = 3;
+```
 
 ### setall(Num(Cool))
 
@@ -261,6 +293,67 @@ Writes the matrix to a file using the specified format. This method can be chain
 ### scanf(Str $filename!)
 
 Reads the matrix from a file containing formatted data. This method can be chained.
+
+### submatrix(Math::Libgsl::Matrix::View $mv, size_t $k1 where * < $!matrix.size1, size_t $k2 where * < $!matrix.size2, size_t $n1, size_t $n2)
+
+Creates a view on a subset of the matrix, starting from coordinates ($k1, $k2) with $n1 rows and $n2 columns. This method returns a new Matrix object. Any operation done on this view affects the original matrix as well.
+
+Every matrix view operation works following this logic:
+
+```perl6
+use Math::Libgsl::Matrix;
+
+my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));     # original matrix
+$m1.setall(1);
+my Math::Libgsl::Matrix::View $mv .= new;                     # view: an object that will contain the view information
+my Math::Libgsl::Matrix $m2 = $m1.submatrix($mv, 1, 1, 2, 2); # $m2 is the matrix created from the view
+$m2.setall(12);                                               # one can operate on $m2 as it is a normal matrix
+say ($m1.get-row($_) for ^3); # $m1 affected as well; output: ([1 1 1 1] [1 12 12 1] [1 12 12 1])
+```
+
+### mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 })
+
+This is not a method, but a sub. It creates a Matrix object from the Raku shaped array.
+
+### mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda)
+
+This is not a method, but a sub. It creates a Matrix object from the Raku array, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix.
+
+### mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
+
+This is not a method, but a sub. It creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
+
+### mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda)
+
+This is not a method, but a sub. It creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
+
+### row-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1)
+
+This method creates a Vector object from row $i of the matrix.
+
+### col-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2)
+
+This method creates a Vector object from column $j of the matrix.
+
+### subrow-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1, size_t $offset, size_t $n)
+
+This method creates a Vector object from row $i of the matrix, starting from $offset and containing $n elements.
+
+### subcol-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n)
+
+This method creates a Vector object from column $j of the matrix, starting from $offset and containing $n elements.
+
+### diagonal-view(Math::Libgsl::Vector::View $vv)
+
+This method creates a Vector object from the diagonal of the matrix.
+
+### subdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2))
+
+This method creates a Vector object from the subdiagonal number $k of the matrix.
+
+### superdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2))
+
+This method creates a Vector object from the superdiagonal number $k of the matrix.
 
 ### copy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2)
 

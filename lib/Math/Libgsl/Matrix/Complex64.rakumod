@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Matrix::Complex64:ver<0.0.6>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Matrix::Complex64:ver<0.1.0>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Complex64 :ALL;
@@ -125,7 +125,7 @@ method subrow-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $i where * 
 method subcol-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_subcolumn($vv.view, $!matrix, $j, $offset, $n);
 }
-method diagonal-view(Math::Libgsl::Vector::Complex64::View $vv, ) {
+method diagonal-view(Math::Libgsl::Vector::Complex64::View $vv) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_diagonal($vv.view, $!matrix);
 }
 method subdiagonal-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
