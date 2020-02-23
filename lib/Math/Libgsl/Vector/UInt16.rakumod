@@ -77,11 +77,11 @@ method subvector-stride(Math::Libgsl::Vector::UInt16::View $vv, size_t $offset w
   fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
   Math::Libgsl::Vector::UInt16.new: vector => mgsl_vector_ushort_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
 }
-sub view-ushort-array(Math::Libgsl::Vector::UInt16::View $vv, @array) is export {
+sub view-ushort-array(Math::Libgsl::Vector::UInt16::View $vv, @array) is export(:withsub) {
   my CArray[uint16] $a .= new: @array».Int;
   Math::Libgsl::Vector::UInt16.new: vector => mgsl_vector_ushort_view_array($vv.view, $a, @array.elems);
 }
-sub view-ushort-array-stride(Math::Libgsl::Vector::UInt16::View $vv, @array, size_t $stride) is export {
+sub view-ushort-array-stride(Math::Libgsl::Vector::UInt16::View $vv, @array, size_t $stride) is export(:withsub) {
   my CArray[uint16] $a .= new: @array».Int;
   Math::Libgsl::Vector::UInt16.new: vector => mgsl_vector_ushort_view_array_with_stride($vv.view, $a, $stride, @array.elems);
 }

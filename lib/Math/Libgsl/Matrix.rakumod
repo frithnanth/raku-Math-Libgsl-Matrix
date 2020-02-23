@@ -76,19 +76,19 @@ method submatrix(Math::Libgsl::Matrix::View $mv, size_t $k1 where * < $!matrix.s
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export {
+sub mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export(:withsub) {
   my CArray[num64] $a .= new: @array.Array».Num;
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array($mv.view, $a, @array.shape[0], @array.shape[1]);
 }
-sub mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export {
+sub mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export(:withsub) {
   fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $tda < @array.shape[1];
   my CArray[num64] $a .= new: @array.Array».Num;
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array_with_tda($mv.view, $a, @array.shape[0], @array.shape[1], $tda);
 }
-sub mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2) is export {
+sub mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2) is export(:withsub) {
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_vector($mv.view, $v.vector, $n1, $n2);
 }
-sub mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda) is export {
+sub mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda) is export(:withsub) {
   fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $n2 > $tda ;
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
 }
@@ -407,7 +407,7 @@ Any operation done on this view affects the original vector as well.
 
 =head3 vec-view-array(Math::Libgsl::Vector::View $vv, @array)
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Vector object from a Raku array.
 
 =begin code :lang<perl6>
@@ -421,7 +421,7 @@ say $v[^10]; # output: (0 1 2 3 4 5 6 7 8 9)
 
 =head3 vec-view-array-stride(Math::Libgsl::Vector::View $vv, @array, size_t $stride)
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Vector object from a Raku array, with stride $stride.
 
 =head3 copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
@@ -576,22 +576,22 @@ say ($m1.get-row($_) for ^3); # $m1 affected as well; output: ([1 1 1 1] [1 12 1
 
 =head3 mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 })
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from the Raku shaped array.
 
 =head3 mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda)
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from the Raku array, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix.
 
 =head3 mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
 
 =head3 mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda)
 
-This is not a method, but a sub.
+This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
 
 =head3 row-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1)

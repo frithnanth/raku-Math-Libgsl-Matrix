@@ -2,7 +2,7 @@
 
 use Test;
 use lib 'lib';
-use Math::Libgsl::Matrix;
+use Math::Libgsl::Matrix :withsub;
 use Math::Libgsl::Vector;
 use Math::Libgsl::Constants;
 
