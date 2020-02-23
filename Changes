@@ -1,6 +1,9 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+0.1.1 2020-02-23T16:43:25+01:00
+    - Don't import subs automatically
+
 0.1.0 2020-02-22T13:43:12+01:00
     - Add Matrix views
     - Change Vector view interface

@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Matrix:ver<0.1.0>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Matrix:ver<0.1.1>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Matrix :ALL;
 use Math::Libgsl::Exception;

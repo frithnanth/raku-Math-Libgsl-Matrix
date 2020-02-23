@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Block::UInt32:ver<0.1.0>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Block::UInt32:ver<0.1.1>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Matrix::UInt32 :ALL;
 use NativeCall;
