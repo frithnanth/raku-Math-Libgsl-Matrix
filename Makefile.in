@@ -6,7 +6,7 @@ all : %gslhelper%
 debug :
 	%MAKE% "DBG=-Wall -g"  all
 
-resources/libraries/%LIB-NAME% : $(SRC)/matrix%O%
+%gslhelper% : $(SRC)/matrix%O%
 	%LD% %LDSHARED% %LDFLAGS% -o %gslhelper% $(SRC)/matrix%O% -lgsl
 
 %%O%: %.c
