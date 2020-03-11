@@ -44,7 +44,7 @@ subtest {
   LEAVE { with $filename.IO { .unlink if .e } }
   ok mgsl_vector_fwrite($filename, $v) == GSL_SUCCESS, 'can write a vector to a file';
   gsl_vector_set_zero($v);
-  ok mgsl_vector_fread($filename, $v) == GSL_SUCCESS, 'can write a vector to a file';
+  ok mgsl_vector_fread($filename, $v) == GSL_SUCCESS, 'can read a vector from a file';
   is-deeply (gather take gsl_vector_get($v, $_) for ^10), (1e0, 0e0 xx 9).flat, 'vector IO ok';
   gsl_vector_free($v);
   gsl_vector_float_free($vf);
@@ -191,7 +191,7 @@ subtest {
   lives-ok { gsl_matrix_set_all($m, 10e0) }, 'set all elements lives';
   ok mgsl_matrix_fwrite($filename, $m) == GSL_SUCCESS, 'can write a matrix to a file';
   gsl_matrix_set_zero($m);
-  ok mgsl_matrix_fread($filename, $m) == GSL_SUCCESS, 'can write a matrix to a file';
+  ok mgsl_matrix_fread($filename, $m) == GSL_SUCCESS, 'can read a matrix from a file';
   is-deeply (gather for ^10 -> $i { for ^10 -> $j { take gsl_matrix_get($m, $i, $j) } } ), 10e0 xx 100, 'matrix IO ok';
   gsl_matrix_free($m);
   gsl_matrix_float_free($mf);
