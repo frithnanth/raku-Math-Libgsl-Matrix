@@ -3,7 +3,6 @@ use v6;
 unit module Math::Libgsl::Raw::Matrix::UInt8:ver<0.1.1>:auth<cpan:FRITH>;
 
 use NativeCall;
-use LibraryMake;
 
 constant GSLHELPER = %?RESOURCES<libraries/gslhelper>.absolute;
 

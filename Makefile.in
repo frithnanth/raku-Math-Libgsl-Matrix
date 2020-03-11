@@ -1,20 +1,21 @@
 SRC=src
 
-all : lib
-
-lib : resources/libraries/%LIB-NAME%
+all : %gslhelper%
 
 # 'all', with compilation warnings
 debug :
 	%MAKE% "DBG=-Wall -g"  all
 
 resources/libraries/%LIB-NAME% : $(SRC)/matrix%O%
-	%LD% %LDSHARED% %LDFLAGS% %LDOUT%resources/libraries/%LIB-NAME% \
-		$(SRC)/matrix%O% \
-		%LIB-LDFLAGS%
+	%LD% %LDSHARED% %LDFLAGS% -o %gslhelper% $(SRC)/matrix%O% -lgsl
 
 %%O%: %.c
-	%CC% -I $(SRC) -c %CCSHARED% %CCFLAGS% -o $@ $< %LIB-CFLAGS% $(DBG)
+	%CC% -I $(SRC) -c %CCSHARED% %CCFLAGS% -I/usr/include/gsl $(DBG) -o $@ $<
 
 clean :
-	@rm -f $(SRC)/*%O% resources/libraries/*%LIB-NAME%
+	@rm -f $(SRC)/*%O%
+	@rm -rf %gslhelper%
+	@rm Makefile
+
+realclean :
+	@rm -rf lib/.precomp

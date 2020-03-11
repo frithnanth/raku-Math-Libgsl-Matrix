@@ -3,9 +3,18 @@
   "authors" : [
     "Fernando Santagata"
   ],
-  "build-depends" : [ ],
+  "build" : {
+    "makefile-variables" : {
+      "gslhelper" : {
+        "resource" : "libraries/gslhelper"
+      }
+    }
+  },
+  "build-depends" : [
+    "Distribution::Builder::MakeFromJSON"
+  ],
+  "builder" : "Distribution::Builder::MakeFromJSON",
   "depends" : [
-    "LibraryMake",
     "Math::Libgsl::Complex",
     "Math::Libgsl::Constants"
   ],
