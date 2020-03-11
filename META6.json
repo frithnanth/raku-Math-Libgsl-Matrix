@@ -15,6 +15,7 @@
   ],
   "builder" : "Distribution::Builder::MakeFromJSON",
   "depends" : [
+    "Distribution::Builder::MakeFromJSON",
     "Math::Libgsl::Complex",
     "Math::Libgsl::Constants"
   ],
