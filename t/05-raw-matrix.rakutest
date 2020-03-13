@@ -280,7 +280,11 @@ subtest {
   is-deeply ( gather for ^4 -> $i { for ^4 -> $j { take gsl_matrix_get($m1, $i, $j) } } ), $mm.flat, 'set column';
   gsl_matrix_set_all($m1, 1e0);
   gsl_matrix_set_zero($m2);
-  gsl_matrix_tricpy('U'.ord, 0, $m2, $m1);
+  if $gsl-version > 2.5 {
+    gsl_matrix_tricpy(CblasUpper, CblasNonUnit, $m2, $m1);
+  } else {
+    gsl_matrix_tricpy('U'.ord, 0, $m2, $m1);
+  }
   is-deeply (gather for ^4 -> $i { for ^4 -> $j { take gsl_matrix_get($m2, $i, $j) } }),
           (0e0, 1e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 0e0), 'triangular copy';
   gsl_matrix_free($m1);
@@ -308,7 +312,11 @@ subtest {
   my gsl_matrix $m2 = gsl_matrix_alloc(4, 4);
   gsl_matrix_set_zero($m2);
   gsl_matrix_set_all($m, 1e0);
-  gsl_matrix_transpose_tricpy('U'.ord, 0, $m2, $m);
+  if $gsl-version > 2.5 {
+    gsl_matrix_transpose_tricpy(CblasUpper, CblasNonUnit, $m2, $m);
+  } else {
+    gsl_matrix_transpose_tricpy('U'.ord, 0, $m2, $m);
+  }
   is-deeply (gather for ^4 -> $i { for ^4 -> $j { take gsl_matrix_get($m2, $i, $j) } }),
           (0e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 1e0, 0e0), 'transpose with triangular copy';
   gsl_matrix_free($m2);

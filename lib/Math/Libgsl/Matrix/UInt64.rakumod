@@ -124,7 +124,12 @@ method swap(Math::Libgsl::Matrix::UInt64 $src where $!matrix.size1 == .matrix.si
   self
 }
 method tricpy(Math::Libgsl::Matrix::UInt64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
-  my $ret = gsl_matrix_ulong_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  my $ret;
+  if $gsl-version > 2.5 {
+    $ret = gsl_matrix_ulong_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
+  } else {
+    $ret = gsl_matrix_ulong_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  }
   fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy the matrix" if $ret ≠ GSL_SUCCESS;
   self
 }
@@ -199,7 +204,12 @@ method transpose() {
 }
 method transpose-tricpy(Math::Libgsl::Matrix::UInt64 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
   fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
-  my $ret = gsl_matrix_ulong_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  my $ret;
+  if $gsl-version > 2.5 {
+    $ret = gsl_matrix_ulong_transpose_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
+  } else {
+    $ret = gsl_matrix_ulong_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  }
   fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy transpose" if $ret ≠ GSL_SUCCESS;
   self
 }

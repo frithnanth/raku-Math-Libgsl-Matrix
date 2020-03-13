@@ -2,6 +2,7 @@ Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
     - add (undocumented) triangular copy functions
+    - getting ready for library v2.6
 
 0.1.2  2020-03-12T10:37:33+01:00
     - Switch from LibraryMake to Distribution::Builder::MakeFromJSON
