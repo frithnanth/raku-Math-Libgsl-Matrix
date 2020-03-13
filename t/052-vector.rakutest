@@ -9,7 +9,7 @@ use Math::Libgsl::Constants;
 subtest {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   isa-ok $v1, Math::Libgsl::Vector, 'new using pair';
-  ok $v1.vector.size == 10, 'attributes ok';
+  ok $v1.vector.size == 10, 'attributes';
   my Math::Libgsl::Vector $v2 .= new(10);
   isa-ok $v2, Math::Libgsl::Vector, 'new using single value';
 }, 'vector allocation';
@@ -30,7 +30,7 @@ subtest {
   is-deeply $v1[^10], (1e0 xx 10), 'all elements set';
   lives-ok { $v1.zero }, 'set all elements to zero';
   is-deeply $v1[^10], (0e0 xx 10), 'all elements zeroed';
-  lives-ok { $v1.basis(1) }, 'basis ok';
+  lives-ok { $v1.basis(1) }, 'basis';
   is-deeply $v1[^10], (0e0, 1e0, 0e0 xx 8).flat, 'basis vector';
   dies-ok { $v1.basis(10) }, 'basis 11 of a 10-element vector dies';
 }, 'vector set & get';
@@ -43,7 +43,7 @@ subtest {
   lives-ok { $v1.write($filename) }, 'can write a vector to file';
   lives-ok { $v1.read($filename) }, 'can read a vector from file';
   lives-ok { $v1.printf($filename, "%3.1lf") }, 'can print a vector to file';
-  is-deeply $filename.IO.lines, '1.0' xx 10, 'vector file ok';
+  is-deeply $filename.IO.lines, '1.0' xx 10, 'vector file';
 }, 'vector IO';
 
 subtest {
@@ -85,12 +85,12 @@ subtest {
   $v1.set($_, $_.Num) for ^10;
   my Math::Libgsl::Vector $v2 .= new(:size(10));
   lives-ok { $v2.copy($v1) }, 'can copy';
-  is-deeply $v2[^10], (0..9).flat».Num, 'copy ok';
+  is-deeply $v2[^10], (0..9).flat».Num, 'copy';
   my Math::Libgsl::Vector $v3 .= new(:size(11));
   dies-ok { $v3.copy($v1) }, "can't copy different sized vectors";
   $v2.zero;
   lives-ok { $v1.swap($v2) }, 'can swap';
-  is-deeply $v1[^10], (0e0 xx 10), 'swap ok';
+  is-deeply $v1[^10], (0e0 xx 10), 'swap';
   dies-ok { $v3.swap($v1) }, "can't swap different sized vectors";
 }, 'vector copy';
 
@@ -98,11 +98,11 @@ subtest {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.set($_, $_.Num) for ^10;
   lives-ok { $v1.swap-elems(0, 1) }, 'can exchange elements';
-  is-deeply $v1[^10], (1e0, 0e0, 2e0..9e0).flat, 'swap elements ok';
+  is-deeply $v1[^10], (1e0, 0e0, 2e0..9e0).flat, 'swap elements';
   dies-ok { $v1.swap-elems(0, 10) }, "can't swap elements out of range";
   $v1.set($_, $_.Num) for ^10;
   lives-ok { $v1.reverse }, 'can reverse elements';
-  is-deeply $v1[^10], (9e0…0e0).flat, 'reverse elements ok';
+  is-deeply $v1[^10], (9e0…0e0).flat, 'reverse elements';
 }, 'element exchange';
 
 subtest {
@@ -112,16 +112,16 @@ subtest {
   $v2.setall(2);
   my Math::Libgsl::Vector $v3 .= new(:size(11));
   lives-ok { $v1.add($v2) }, 'can add';
-  is-deeply $v1[^10], (6e0 xx 10), 'add ok';
+  is-deeply $v1[^10], (6e0 xx 10), 'add';
   dies-ok { $v1.add($v3) }, "can't add vectors of different size";
   lives-ok { $v1.sub($v2) }, 'can sub';
-  is-deeply $v1[^10], (4e0 xx 10), 'sub ok';
+  is-deeply $v1[^10], (4e0 xx 10), 'sub';
   dies-ok { $v1.sub($v3) }, "can't sub vectors of different size";
   lives-ok { $v1.mul($v2) }, 'can mul';
-  is-deeply $v1[^10], (8e0 xx 10), 'mul ok';
+  is-deeply $v1[^10], (8e0 xx 10), 'mul';
   dies-ok { $v1.mul($v3) }, "can't mul vectors of different size";
   lives-ok { $v1.div($v2) }, 'can div';
-  is-deeply $v1[^10], (4e0 xx 10), 'div ok';
+  is-deeply $v1[^10], (4e0 xx 10), 'div';
   dies-ok { $v1.div($v3) }, "can't div vectors of different size";
 }, 'vector operations';
 

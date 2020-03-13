@@ -363,6 +363,10 @@ This method copies the $src matrix into the current one. This method can be chai
 
 This method swaps elements of the $src matrix and the current one. This method can be chained.
 
+### tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag)
+
+This method copies the upper or lower trianglular matrix from **$src** to b<self>. Use the **cblas-uplo** enumeration to specify which triangle copy. Use the **cblas-diag** enumeration to specify whether to copy the matrix diagonal. This method can be chained.
+
 ### get-row(Int:D $i where * < $!matrix.size1)
 
 This method returns an array from row number $i.
@@ -402,6 +406,10 @@ This method copies a matrix into the current one, while transposing the elements
 ### transpose()
 
 This method transposes the current matrix. This method can be chained.
+
+### transpose-tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag)
+
+This method copies a triangle from the **$src** matrix into the current one, while transposing the elements. Use the **cblas-uplo** enumeration to specify which triangle copy. Use the **cblas-diag** enumeration to specify whether to copy the matrix diagonal. This method can be chained.
 
 ### add(Math::Libgsl::Matrix $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2)
 

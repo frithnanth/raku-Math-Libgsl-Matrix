@@ -124,6 +124,11 @@ method swap(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $
   fail X::Libgsl.new: errno => $ret, error => "Can't swap the matrices" if $ret ≠ GSL_SUCCESS;
   self
 }
+method tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
+  my $ret = gsl_matrix_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy the matrix" if $ret ≠ GSL_SUCCESS;
+  self
+}
 # Rows and columns
 method get-row(Int:D $i where * < $!matrix.size1) {
   my gsl_vector $v = gsl_vector_calloc($!matrix.size2);
@@ -193,6 +198,12 @@ method transpose() {
   fail X::Libgsl.new: errno => $ret, error => "Can't transpose" if $ret ≠ GSL_SUCCESS;
   self
 }
+method transpose-tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
+  fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
+  my $ret = gsl_matrix_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy transpose" if $ret ≠ GSL_SUCCESS;
+  self
+}
 # Matrix operations
 method add(Math::Libgsl::Matrix $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_add($!matrix, $b.matrix);
@@ -255,8 +266,6 @@ method is-nonneg(--> Bool) { gsl_matrix_isnonneg($!matrix) ?? True !! False }
 method is-equal(Math::Libgsl::Matrix $b --> Bool) { gsl_matrix_equal($!matrix, $b.matrix) ?? True !! False }
 
 =begin pod
-
-[![Build Status](https://travis-ci.org/frithnanth/raku-Math-Libgsl-Matrix.svg?branch=master)](https://travis-ci.org/frithnanth/raku-Math-Libgsl-Matrix)
 
 =head1 NAME
 
@@ -632,6 +641,13 @@ This method can be chained.
 This method swaps elements of the $src matrix and the current one.
 This method can be chained.
 
+=head3 tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag)
+
+This method copies the upper or lower trianglular matrix from B<$src> to b<self>.
+Use the B<cblas-uplo> enumeration to specify which triangle copy.
+Use the B<cblas-diag> enumeration to specify whether to copy the matrix diagonal.
+This method can be chained.
+
 =head3 get-row(Int:D $i where * < $!matrix.size1)
 
 This method returns an array from row number $i.
@@ -675,6 +691,13 @@ This method can be chained.
 =head3 transpose()
 
 This method transposes the current matrix.
+This method can be chained.
+
+=head3 transpose-tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag)
+
+This method copies a triangle from the B<$src> matrix into the current one, while transposing the elements.
+Use the B<cblas-uplo> enumeration to specify which triangle copy.
+Use the B<cblas-diag> enumeration to specify whether to copy the matrix diagonal.
 This method can be chained.
 
 =head3 add(Math::Libgsl::Matrix $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2)

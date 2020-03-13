@@ -131,6 +131,7 @@ sub mgsl_matrix_ulong_superdiagonal(gsl_vector_ulong_view $view, gsl_matrix_ulon
 # Copying matrices
 sub gsl_matrix_ulong_memcpy(gsl_matrix_ulong $dest, gsl_matrix_ulong $src --> int32) is native(LIB) is export(:matrixcopy) { * }
 sub gsl_matrix_ulong_swap(gsl_matrix_ulong $m1, gsl_matrix_ulong $m2 --> int32) is native(LIB) is export(:matrixcopy) { * }
+sub gsl_matrix_ulong_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_ulong $dest, gsl_matrix_ulong $src --> int32) is native(LIB) is export(:matrixcopy) { * }
 # Copying rows and columns
 sub gsl_matrix_ulong_get_row(gsl_vector_ulong $v, gsl_matrix_ulong $m, size_t $i --> int32) is native(LIB) is export(:matrixcopy) { * }
 sub gsl_matrix_ulong_get_col(gsl_vector_ulong $v, gsl_matrix_ulong $m, size_t $j --> int32) is native(LIB) is export(:matrixcopy) { * }
@@ -141,6 +142,7 @@ sub gsl_matrix_ulong_swap_rows(gsl_matrix_ulong $m, size_t $i, size_t $j --> int
 sub gsl_matrix_ulong_swap_columns(gsl_matrix_ulong $m, size_t $i, size_t $j --> int32) is native(LIB) is export(:matrixexch) { * }
 sub gsl_matrix_ulong_swap_rowcol(gsl_matrix_ulong $m, size_t $i, size_t $j --> int32) is native(LIB) is export(:matrixexch) { * }
 sub gsl_matrix_ulong_transpose_memcpy(gsl_matrix_ulong $dest, gsl_matrix_ulong $src --> int32) is native(LIB) is export(:matrixexch) { * }
+sub gsl_matrix_ulong_transpose_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_ulong $dest, gsl_matrix_ulong $src --> int32) is native(LIB) is export(:matrixexch) { * }
 sub gsl_matrix_ulong_transpose(gsl_matrix_ulong $m --> int32) is native(LIB) is export(:matrixexch) { * }
 # Matrix operations
 sub gsl_matrix_ulong_add(gsl_matrix_ulong $a, gsl_matrix_ulong $b --> int32) is native(LIB) is export(:matrixop) { * }

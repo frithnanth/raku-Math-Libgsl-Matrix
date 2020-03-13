@@ -9,7 +9,7 @@ use Math::Libgsl::Constants;
 subtest {
   my Math::Libgsl::Block $b1 .= new(:size(10));
   isa-ok $b1, Math::Libgsl::Block, 'new using pair';
-  ok $b1.block.size == 10, 'attributes ok';
+  ok $b1.block.size == 10, 'attributes';
   my Math::Libgsl::Block $b2 .= new(10);
   isa-ok $b2, Math::Libgsl::Block, 'new using single value';
   my $filename = 't/block.dat';
@@ -17,13 +17,13 @@ subtest {
   ok $b1.write($filename) == GSL_SUCCESS, 'can write a block to file';
   ok $b2.read($filename) == GSL_SUCCESS, 'can read a block from file';
   ok $b1.printf($filename, "%3.1lf") == GSL_SUCCESS, 'can print a block to file';
-  is-deeply $filename.IO.lines, '0.0' xx 10, 'block file ok';
+  is-deeply $filename.IO.lines, '0.0' xx 10, 'block file';
 }, 'block';
 
 subtest {
   my Math::Libgsl::Block::Num32 $b1 .= new(:size(10));
   isa-ok $b1, Math::Libgsl::Block::Num32, 'new using pair';
-  ok $b1.block.size == 10, 'attributes ok';
+  ok $b1.block.size == 10, 'attributes';
   my Math::Libgsl::Block::Num32 $b2 .= new(10);
   isa-ok $b2, Math::Libgsl::Block::Num32, 'new using single value';
   my $filename = 't/block.dat';
@@ -31,7 +31,7 @@ subtest {
   ok $b1.write($filename) == GSL_SUCCESS, 'can write a block to file';
   ok $b2.read($filename) == GSL_SUCCESS, 'can read a block from file';
   ok $b1.printf($filename, "%3.1lf") == GSL_SUCCESS, 'can print a block to file';
-  is-deeply $filename.IO.lines, '0.0' xx 10, 'block file ok';
+  is-deeply $filename.IO.lines, '0.0' xx 10, 'block file';
 }, 'float block';
 
 done-testing;

@@ -123,6 +123,11 @@ method swap(Math::Libgsl::Matrix::UInt16 $src where $!matrix.size1 == .matrix.si
   fail X::Libgsl.new: errno => $ret, error => "Can't swap the matrices" if $ret ≠ GSL_SUCCESS;
   self
 }
+method tricpy(Math::Libgsl::Matrix::UInt16 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
+  my $ret = gsl_matrix_ushort_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy the matrix" if $ret ≠ GSL_SUCCESS;
+  self
+}
 # Rows and columns
 method get-row(Int:D $i where * < $!matrix.size1) {
   my gsl_vector_ushort $v = gsl_vector_ushort_calloc($!matrix.size2);
@@ -190,6 +195,12 @@ method transpose() {
   fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
   my $ret = gsl_matrix_ushort_transpose($!matrix);
   fail X::Libgsl.new: errno => $ret, error => "Can't transpose" if $ret ≠ GSL_SUCCESS;
+  self
+}
+method transpose-tricpy(Math::Libgsl::Matrix::UInt16 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
+  fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
+  my $ret = gsl_matrix_ushort_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy transpose" if $ret ≠ GSL_SUCCESS;
   self
 }
 # Matrix operations

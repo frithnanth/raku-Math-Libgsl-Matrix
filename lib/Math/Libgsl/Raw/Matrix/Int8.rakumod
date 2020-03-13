@@ -131,6 +131,7 @@ sub mgsl_matrix_char_superdiagonal(gsl_vector_char_view $view, gsl_matrix_char $
 # Copying matrices
 sub gsl_matrix_char_memcpy(gsl_matrix_char $dest, gsl_matrix_char $src --> int32) is native(LIB) is export(:matrixcopy) { * }
 sub gsl_matrix_char_swap(gsl_matrix_char $m1, gsl_matrix_char $m2 --> int32) is native(LIB) is export(:matrixcopy) { * }
+sub gsl_matrix_char_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_char $dest, gsl_matrix_char $src --> int32) is native(LIB) is export(:matrixcopy) { * }
 # Copying rows and columns
 sub gsl_matrix_char_get_row(gsl_vector_char $v, gsl_matrix_char $m, size_t $i --> int32) is native(LIB) is export(:matrixcopy) { * }
 sub gsl_matrix_char_get_col(gsl_vector_char $v, gsl_matrix_char $m, size_t $j --> int32) is native(LIB) is export(:matrixcopy) { * }
@@ -142,6 +143,7 @@ sub gsl_matrix_char_swap_columns(gsl_matrix_char $m, size_t $i, size_t $j --> in
 sub gsl_matrix_char_swap_rowcol(gsl_matrix_char $m, size_t $i, size_t $j --> int32) is native(LIB) is export(:matrixexch) { * }
 sub gsl_matrix_char_transpose_memcpy(gsl_matrix_char $dest, gsl_matrix_char $src --> int32) is native(LIB) is export(:matrixexch) { * }
 sub gsl_matrix_char_transpose(gsl_matrix_char $m --> int32) is native(LIB) is export(:matrixexch) { * }
+sub gsl_matrix_char_transpose_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_char $dest, gsl_matrix_char $src --> int32) is native(LIB) is export(:matrixexch) { * }
 # Matrix operations
 sub gsl_matrix_char_add(gsl_matrix_char $a, gsl_matrix_char $b --> int32) is native(LIB) is export(:matrixop) { * }
 sub gsl_matrix_char_sub(gsl_matrix_char $a, gsl_matrix_char $b --> int32) is native(LIB) is export(:matrixop) { * }
