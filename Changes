@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+
+0.1.3  2020-03-25T10:20:44+01:00
     - add (undocumented) triangular copy functions
     - getting ready for library v2.6
 
