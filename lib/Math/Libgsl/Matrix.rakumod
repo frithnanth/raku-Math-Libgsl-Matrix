@@ -597,11 +597,18 @@ say ($m1.get-row($_) for ^3); # $m1 affected as well; output: ([1 1 1 1] [1 12 1
 
 This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from the Raku shaped array.
+When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so the second index of the shaped array must be doubled.
+For instance to get a 7x7 complex matrix, declare the array this way:
+
+=begin code
+my Num @data[7;14] = (…);
+=end code
 
 =head3 mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda)
 
 This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Matrix object from the Raku array, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix.
+When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so the second index of the shaped array must be doubled.
 
 =head3 mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
 
