@@ -99,12 +99,12 @@ method submatrix(Math::Libgsl::Matrix::Complex64::View $mv, size_t $k1 where * <
 }
 sub mat-view-array(Math::Libgsl::Matrix::Complex64::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export(:withsub) {
   my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array($mv.view, $a, @array.shape[0], @array.shape[1]);
+  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array($mv.view, $a, @array.shape[0], (@array.shape[1] / 2).Int);
 }
 sub mat-view-array-tda(Math::Libgsl::Matrix::Complex64::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export(:withsub) {
   fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $tda < @array.shape[1];
   my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array_with_tda($mv.view, $a, @array.shape[0], @array.shape[1], $tda);
+  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array_with_tda($mv.view, $a, @array.shape[0], (@array.shape[1] / 2).Int, $tda);
 }
 sub mat-view-vector(Math::Libgsl::Matrix::Complex64::View $mv, Math::Libgsl::Vector::Complex64 $v, size_t $n1, size_t $n2) is export(:withsub) {
   Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_vector($mv.view, $v.vector, $n1, $n2);
