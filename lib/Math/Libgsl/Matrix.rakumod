@@ -438,10 +438,18 @@ my Math::Libgsl::Vector $v = vec-view-array($vv, @array);
 say $v[^10]; # output: (0 1 2 3 4 5 6 7 8 9)
 =end code
 
+The name of this sub is different according to the data type. For example the sub that builds a Math::Libgsl::Vector::UInt64 is called vec-view-ulong-array().
+
+When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so to make a 10-element complex vector one needs a 20-element Num array.
+
 =head3 vec-view-array-stride(Math::Libgsl::Vector::View $vv, @array, size_t $stride)
 
 This is not a method, but a sub; it's not imported unless one specifies :witsub.
 It creates a Vector object from a Raku array, with stride $stride.
+
+The name of this sub is different according to the data type. For example the sub that builds a Math::Libgsl::Vector::UInt64 is called vec-view-ulong-array-stride().
+
+When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so to make a 10-element complex vector one needs a 20-element Num array.
 
 =head3 copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
 
