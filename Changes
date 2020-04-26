@@ -2,6 +2,11 @@ Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
 
+0.1.4  2020-04-26T15:02:02+02:00
+    - Document mat-view-array* for complex types
+    - Rename vector view-*-array subs into vec-view-*-array for consistency
+    - Fix mat-view-array constraints for complex types
+
 0.1.3  2020-03-25T10:20:44+01:00
     - add (undocumented) triangular copy functions
     - getting ready for library v2.6

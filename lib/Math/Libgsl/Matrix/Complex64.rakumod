@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Matrix::Complex64:ver<0.1.3>:auth<cpan:FRITH>;
+unit class Math::Libgsl::Matrix::Complex64:ver<0.1.4>:auth<cpan:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Complex64 :ALL;
