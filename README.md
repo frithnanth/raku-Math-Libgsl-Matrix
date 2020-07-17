@@ -158,7 +158,7 @@ Creates a view on a subset of the vector, starting from $offset and of length $n
 
 ### vec-view-array(Math::Libgsl::Vector::View $vv, @array)
 
-This is not a method, but a sub; it's not imported unless one specifies :witsub. It creates a Vector object from a Raku array.
+This is not a method, but a sub; it's not imported unless one specifies :withsub. It creates a Vector object from a Raku array.
 
 ```perl6
 use Math::Libgsl::Vector;
