@@ -489,8 +489,8 @@ Prerequisites
 
 This module requires the libgsl library to be installed. Please follow the instructions below based on your platform:
 
-Debian Linux
-------------
+Debian Linux and Ubuntu 20.04
+-----------------------------
 
     sudo apt install libgsl23 libgsl-dev libgslcblas0
 
