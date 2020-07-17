@@ -426,7 +426,7 @@ Any operation done on this view affects the original vector as well.
 
 =head3 vec-view-array(Math::Libgsl::Vector::View $vv, @array)
 
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
+This is not a method, but a sub; it's not imported unless one specifies :withsub.
 It creates a Vector object from a Raku array.
 
 =begin code :lang<perl6>
