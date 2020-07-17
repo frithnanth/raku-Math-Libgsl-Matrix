@@ -128,7 +128,7 @@ method tricpy(Math::Libgsl::Matrix::Num32 $src where $!matrix.size1 == .matrix.s
   if $gsl-version > 2.5 {
     $ret = gsl_matrix_float_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
-    $ret = gsl_matrix_float_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+    $ret = gsl_matrix_float_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
   }
   fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy the matrix" if $ret ≠ GSL_SUCCESS;
   self
@@ -208,7 +208,7 @@ method transpose-tricpy(Math::Libgsl::Matrix::Num32 $src where $!matrix.size1 ==
   if $gsl-version > 2.5 {
     $ret = gsl_matrix_float_transpose_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
-    $ret = gsl_matrix_float_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 1 !! 0, $!matrix, $src.matrix);
+    $ret = gsl_matrix_float_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
   }
   fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy transpose" if $ret ≠ GSL_SUCCESS;
   self

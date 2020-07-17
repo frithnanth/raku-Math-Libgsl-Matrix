@@ -106,7 +106,7 @@ subtest {
   my Math::Libgsl::Matrix $m3 .= new(:size1(4), :size2(4));
   $m3.setall(1);
   my Math::Libgsl::Matrix $m4 .= new(:size1(4), :size2(4));
-  lives-ok { $m4.tricpy($m3, CblasUpper, CblasNonUnit) }, 'can tricpy';
+  lives-ok { $m4.tricpy($m3, CblasUpper, CblasUnit) }, 'can tricpy';
   is-deeply ($m4.get-row($_) for ^4).flat, (0e0, 1e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 0e0), 'tricpy matrix';
 }, 'copy & swap';
 
@@ -151,7 +151,7 @@ subtest {
   my Math::Libgsl::Matrix $m4 .= new(:size1(4), :size2(4));
   $m4.setall(1);
   my Math::Libgsl::Matrix $m5 .= new(:size1(4), :size2(4));
-  lives-ok { $m5.transpose-tricpy($m4, CblasUpper, CblasNonUnit) }, 'can tricpy and transpose';
+  lives-ok { $m5.transpose-tricpy($m4, CblasUpper, CblasUnit) }, 'can tricpy and transpose';
   is-deeply ($m5.get-row($_) for ^4).flat, (0e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 1e0, 0e0), 'tricpy and transpose matrix';
 }, 'exchange rows & columns';
 

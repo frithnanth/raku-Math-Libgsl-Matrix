@@ -281,7 +281,7 @@ subtest {
   gsl_matrix_set_all($m1, 1e0);
   gsl_matrix_set_zero($m2);
   if $gsl-version > 2.5 {
-    gsl_matrix_tricpy(CblasUpper, CblasNonUnit, $m2, $m1);
+    gsl_matrix_tricpy(CblasUpper, CblasUnit, $m2, $m1);
   } else {
     gsl_matrix_tricpy('U'.ord, 0, $m2, $m1);
   }
@@ -313,7 +313,7 @@ subtest {
   gsl_matrix_set_zero($m2);
   gsl_matrix_set_all($m, 1e0);
   if $gsl-version > 2.5 {
-    gsl_matrix_transpose_tricpy(CblasUpper, CblasNonUnit, $m2, $m);
+    gsl_matrix_transpose_tricpy(CblasUpper, CblasUnit, $m2, $m);
   } else {
     gsl_matrix_transpose_tricpy('U'.ord, 0, $m2, $m);
   }
