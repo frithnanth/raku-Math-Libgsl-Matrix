@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Sorry, *-view-*-array* subs are not reliable. Deleted until I find out a new way to implement them
 
 0.1.4  2020-04-26T15:02:02+02:00
     - Document mat-view-array* for complex types

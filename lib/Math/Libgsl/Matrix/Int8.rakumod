@@ -75,15 +75,6 @@ method submatrix(Math::Libgsl::Matrix::Int8::View $mv, size_t $k1 where * < $!ma
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix::Int8.new: matrix => mgsl_matrix_char_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-array(Math::Libgsl::Matrix::Int8::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export(:withsub) {
-  my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix::Int8.new: matrix => mgsl_matrix_char_view_array($mv.view, $a, @array.shape[0], @array.shape[1]);
-}
-sub mat-view-array-tda(Math::Libgsl::Matrix::Int8::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export(:withsub) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $tda < @array.shape[1];
-  my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix::Int8.new: matrix => mgsl_matrix_char_view_array_with_tda($mv.view, $a, @array.shape[0], @array.shape[1], $tda);
-}
 sub mat-view-vector(Math::Libgsl::Matrix::Int8::View $mv, Math::Libgsl::Vector::Int8 $v, size_t $n1, size_t $n2) is export(:withsub) {
   Math::Libgsl::Matrix::Int8.new: matrix => mgsl_matrix_char_view_vector($mv.view, $v.vector, $n1, $n2);
 }

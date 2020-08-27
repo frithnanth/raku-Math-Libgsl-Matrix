@@ -104,14 +104,6 @@ method subvector-stride(Math::Libgsl::Vector::Complex32::View $vv, size_t $offse
 fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
   Math::Libgsl::Vector::Complex32.new: vector => mgsl_vector_complex_float_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
 }
-sub vec-view-complex32-array(Math::Libgsl::Vector::Complex32::View $vv, @array) is export(:withsub) {
-  my CArray[num32] $a .= new: @array».Num;
-  Math::Libgsl::Vector::Complex32.new: vector => mgsl_vector_complex_float_view_array($vv.view, $a, (@array.elems / 2).Int);
-}
-sub vec-view-complex32-array-stride(Math::Libgsl::Vector::Complex32::View $vv, @array, size_t $stride) is export(:withsub) {
-  my CArray[num32] $a .= new: @array».Num;
-  Math::Libgsl::Vector::Complex32.new: vector => mgsl_vector_complex_float_view_array_with_stride($vv.view, $a, $stride, (@array.elems / 2).Int);
-}
 method complex32-real(Math::Libgsl::Vector::Num32::View $vv) {
   Math::Libgsl::Vector::Num32.new: vector => mgsl_vector_complex_float_real($vv.view, $!vector);
 }

@@ -76,15 +76,6 @@ method submatrix(Math::Libgsl::Matrix::View $mv, size_t $k1 where * < $!matrix.s
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }) is export(:withsub) {
-  my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array($mv.view, $a, @array.shape[0], @array.shape[1]);
-}
-sub mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda) is export(:withsub) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $tda < @array.shape[1];
-  my CArray[num64] $a .= new: @array.Array».Num;
-  Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_array_with_tda($mv.view, $a, @array.shape[0], @array.shape[1], $tda);
-}
 sub mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2) is export(:withsub) {
   Math::Libgsl::Matrix.new: matrix => mgsl_matrix_view_vector($mv.view, $v.vector, $n1, $n2);
 }
@@ -424,33 +415,6 @@ Creates a view on a subset of the vector, starting from $offset and of length $n
 This method returns a new Vector object.
 Any operation done on this view affects the original vector as well.
 
-=head3 vec-view-array(Math::Libgsl::Vector::View $vv, @array)
-
-This is not a method, but a sub; it's not imported unless one specifies :withsub.
-It creates a Vector object from a Raku array.
-
-=begin code :lang<perl6>
-use Math::Libgsl::Vector :withsub;
-
-my Math::Libgsl::Vector::View $vv .= new;
-my @array = ^10;
-my Math::Libgsl::Vector $v = vec-view-array($vv, @array);
-say $v[^10]; # output: (0 1 2 3 4 5 6 7 8 9)
-=end code
-
-The name of this sub is different according to the data type. For example the sub that builds a Math::Libgsl::Vector::UInt64 is called vec-view-ulong-array().
-
-When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so to make a 10-element complex vector one needs a 20-element Num array.
-
-=head3 vec-view-array-stride(Math::Libgsl::Vector::View $vv, @array, size_t $stride)
-
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
-It creates a Vector object from a Raku array, with stride $stride.
-
-The name of this sub is different according to the data type. For example the sub that builds a Math::Libgsl::Vector::UInt64 is called vec-view-ulong-array-stride().
-
-When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so to make a 10-element complex vector one needs a 20-element Num array.
-
 =head3 copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
 
 This method copies the vector $src into the current object.
@@ -601,31 +565,14 @@ $m2.setall(12);                                               # one can operate 
 say ($m1.get-row($_) for ^3); # $m1 affected as well; output: ([1 1 1 1] [1 12 12 1] [1 12 12 1])
 =end code
 
-=head3 mat-view-array(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 })
-
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
-It creates a Matrix object from the Raku shaped array.
-When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so the second index of the shaped array must be doubled.
-For instance to get a 7x7 complex matrix, declare the array this way:
-
-=begin code
-my Num @data[7;14] = (…);
-=end code
-
-=head3 mat-view-array-tda(Math::Libgsl::Matrix::View $mv, @array where { @array ~~ Array && @array.shape.elems == 2 }, size_t $tda)
-
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
-It creates a Matrix object from the Raku array, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix.
-When using a complex type (Complex64 and Complex32) the array elements are Nums; the real and imaginary part of the complex number are represented by two Nums, so the second index of the shaped array must be doubled.
-
 =head3 mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
 
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
+This is not a method, but a sub; it's not imported unless one specifies :withsub.
 It creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
 
 =head3 mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda)
 
-This is not a method, but a sub; it's not imported unless one specifies :witsub.
+This is not a method, but a sub; it's not imported unless one specifies :withsub.
 It creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
 
 =head3 row-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1)
@@ -668,7 +615,7 @@ This method can be chained.
 
 =head3 tricpy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag)
 
-This method copies the upper or lower trianglular matrix from B<$src> to b<self>.
+This method copies the upper or lower trianglular matrix from B<$src> to B<self>.
 Use the B<cblas-uplo> enumeration to specify which triangle copy.
 Use the B<cblas-diag> enumeration to specify whether to copy the matrix diagonal.
 This method can be chained.

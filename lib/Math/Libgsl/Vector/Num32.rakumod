@@ -77,14 +77,6 @@ method subvector-stride(Math::Libgsl::Vector::Num32::View $vv, size_t $offset wh
   fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
   Math::Libgsl::Vector::Num32.new: vector => mgsl_vector_float_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
 }
-sub vec-view-float-array(Math::Libgsl::Vector::Num32::View $vv, @array) is export(:withsub) {
-  my CArray[num32] $a .= new: @array».Num;
-  Math::Libgsl::Vector::Num32.new: vector => mgsl_vector_float_view_array($vv.view, $a, @array.elems);
-}
-sub vec-view-float-array-stride(Math::Libgsl::Vector::Num32::View $vv, @array, size_t $stride) is export(:withsub) {
-  my CArray[num32] $a .= new: @array».Num;
-  Math::Libgsl::Vector::Num32.new: vector => mgsl_vector_float_view_array_with_stride($vv.view, $a, $stride, @array.elems);
-}
 # Copy
 method copy(Math::Libgsl::Vector::Num32 $src where $!vector.size == .vector.size) {
   my $ret = gsl_vector_float_memcpy($!vector, $src.vector);

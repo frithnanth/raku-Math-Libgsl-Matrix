@@ -55,15 +55,6 @@ subtest {
   dies-ok  { $m1.submatrix($mv1, 3, 2, 1, 1) }, 'submatrix 4x4 of a 3x4 matrix dies';
   dies-ok  { $m1.submatrix($mv1, 2, 4, 1, 1) }, 'submatrix 3x5 of a 3x4 matrix dies';
   dies-ok  { $m1.submatrix($mv1, 2, 3, 2, 1) }, 'submatrix 4x4 of a 3x4 matrix dies';
-  my @a[2;3] = (1, 2, 3), (4, 5, 6);
-  $m2 = mat-view-array($mv1, @a);
-  is-deeply ($m2.get-row($_) for ^2).flat, (1e0..6e0).flat, 'matrix view';
-  my @b = 1..6;
-  dies-ok { mat-view-array($mv1, @b) }, "can't create a view on a regular array";
-  $m2 = mat-view-array-tda($mv1, @a, 4);
-  is-deeply ($m2.get-row($_) for ^2).flat, (1e0, 2e0, 3e0, 5e0, 6e0, 0e0).flat, 'matrix view with tda';
-  dies-ok { mat-view-array-tda($mv1, @b, 2) }, "can't create a view with tda on a regular array";
-  dies-ok { mat-view-array-tda($mv1, @a, 2) }, "can't create a view with tda if tda<n2";
   my Math::Libgsl::Vector $v1 .= new(:size(9));
   $v1.set($_, $_.Num) for ^9;
   $m2 = mat-view-vector($mv1, $v1, 3, 3);
