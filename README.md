@@ -77,9 +77,9 @@ All the following methods are available for the classes correspondig to each dat
 Vector
 ------
 
-### new(Int $size!) { self.bless(:$size) }
+### new(Int $size!)
 
-### new(Int :$size!) { self.bless(:$size) }
+### new(Int :$size!)
 
 The constructor accepts one parameter: the vector's size; it can be passed as a Pair or as a single value.
 
