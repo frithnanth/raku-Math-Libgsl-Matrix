@@ -161,7 +161,7 @@ Creates a view on a subset of the vector, starting from $offset and of length $n
 This is not a method, but a sub; it's not imported unless one specifies :withsub. It creates a Vector object from a Raku array.
 
 ```perl6
-use Math::Libgsl::Vector;
+use Math::Libgsl::Vector :withsub;
 
 my Math::Libgsl::Vector::View $vv .= new;
 my @array = ^10;
