@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+
+0.2.0  2020-08-29T12:50:08+02:00
     - Sorry, *-view-*-array* subs are not reliable. Deleted until I find out a new way to implement them
 
 0.1.4  2020-04-26T15:02:02+02:00
