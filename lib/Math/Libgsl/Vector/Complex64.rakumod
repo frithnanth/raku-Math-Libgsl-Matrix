@@ -6,13 +6,33 @@ use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Complex64 :ALL;
 use Math::Libgsl::Exception;
 use Math::Libgsl::Constants;
-use Math::Libgsl::Vector;
+use Math::Libgsl::Vector ();
 use NativeCall;
 
 class View {
   has gsl_vector_complex_view $.view;
   submethod BUILD { $!view = alloc_gsl_vector_complex_view }
   submethod DESTROY { free_gsl_vector_complex_view($!view) }
+  method subvector(Math::Libgsl::Vector::Complex64 $v, size_t $offset where * < $v.vector.size, size_t $n --> Math::Libgsl::Vector::Complex64) {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $v.vector.size;
+    Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector($!view, $v.vector, $offset, $n);
+  }
+  method subvector-stride(Math::Libgsl::Vector::Complex64 $v, size_t $offset where * < $v.vector.size, size_t $stride, size_t $n --> Math::Libgsl::Vector::Complex64) {
+  fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $v.vector.size;
+    Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector_with_stride($!view, $v.vector, $offset, $stride, $n);
+  }
+  method real(Math::Libgsl::Vector::Complex64 $v --> Math::Libgsl::Vector) {
+    Math::Libgsl::Vector.new: vector => mgsl_vector_complex_real($!view, $v.vector);
+  }
+  method imag(Math::Libgsl::Vector::Complex64 $v --> Math::Libgsl::Vector) {
+    Math::Libgsl::Vector.new: vector => mgsl_vector_complex_imag($!view, $v.vector);
+  }
+  method array($array --> Math::Libgsl::Vector::Complex64) {
+    Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_view_array($!view, $array, ($array.list.elems / 2).Int);
+  }
+  method array-stride($array, size_t $stride --> Math::Libgsl::Vector::Complex64) {
+    Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_view_array_with_stride($!view, $array, $stride, ($array.list.elems / 2).Int);
+  }
 }
 
 has gsl_vector_complex $.vector;
@@ -74,6 +94,7 @@ method basis(Int:D $index! where * < $!vector.size) {
   fail X::Libgsl.new: errno => $ret, error => "Can't make a basis vector" if $ret ≠ GSL_SUCCESS;
   self
 }
+method size(--> UInt){ self.vector.size }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_vector_complex_fwrite($filename, $!vector);
@@ -96,19 +117,8 @@ method scanf(Str $filename!) {
   self
 }
 # View
-method subvector(Math::Libgsl::Vector::Complex64::View $vv, size_t $offset where * < $!vector.size, size_t $n) {
-fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector($vv.view, $!vector, $offset, $n);
-}
-method subvector-stride(Math::Libgsl::Vector::Complex64::View $vv, size_t $offset where * < $!vector.size, size_t $stride, size_t $n) {
-fail X::Libgsl.new: errno => GSL_EDOM, error => "Subvector index out of bound" if $offset + $n > $!vector.size;
-  Math::Libgsl::Vector::Complex64.new: vector => mgsl_vector_complex_subvector_with_stride($vv.view, $!vector, $offset, $stride, $n);
-}
-method complex64-real(Math::Libgsl::Vector::View $vv) {
-  Math::Libgsl::Vector.new: vector => mgsl_vector_complex_real($vv.view, $!vector);
-}
-method complex64-imag(Math::Libgsl::Vector::View $vv) {
-  Math::Libgsl::Vector.new: vector => mgsl_vector_complex_imag($vv.view, $!vector);
+sub complex64-prepvec(@array) is export {
+  my CArray[num64] $array .= new: @array».Num;
 }
 # Copy
 method copy(Math::Libgsl::Vector::Complex64 $src where $!vector.size == .vector.size) {

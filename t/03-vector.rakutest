@@ -3,13 +3,14 @@
 use Test;
 use lib 'lib';
 use Math::Libgsl::Vector;
-use Math::Libgsl::Vector::Complex64;
+use Math::Libgsl::Vector::Complex64 ();
 use Math::Libgsl::Constants;
 
 subtest {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   isa-ok $v1, Math::Libgsl::Vector, 'new using pair';
-  ok $v1.vector.size == 10, 'attributes';
+  ok $v1.vector.size == 10, 'size directly';
+  ok $v1.size == 10, 'size through method';
   my Math::Libgsl::Vector $v2 .= new(10);
   isa-ok $v2, Math::Libgsl::Vector, 'new using single value';
 }, 'vector allocation';
@@ -51,14 +52,14 @@ subtest {
   $v1.setall(1);
   my Math::Libgsl::Vector $vv1;
   my Math::Libgsl::Vector::View $vv .= new;
-  lives-ok { $vv1 = $v1.subvector($vv, 0, 3) }, 'create subvector';
+  lives-ok { $vv1 = $vv.subvector($v1, 0, 3) }, 'create subvector';
   $vv1.setall(12);
   is-deeply $v1[^10], (12e0 xx 3, 1e0 xx 7).flat, 'modify vector using subvector';
-  dies-ok { $vv1 = $v1.subvector($vv, 10, 2) }, 'dies if subvector offset past end than vector';
-  dies-ok { $vv1 = $v1.subvector($vv, 0, 11) }, 'dies if subvector longer than vector';
+  dies-ok { $vv1 = $vv.subvector($v1, 10, 2) }, 'dies if subvector offset past end than vector';
+  dies-ok { $vv1 = $vv.subvector($v1, 0, 11) }, 'dies if subvector longer than vector';
   $v1.setall(1);
   my Math::Libgsl::Vector $vv2;
-  lives-ok { $vv2 = $v1.subvector-stride($vv, 0, 2, 3) }, 'create subvector with stride';
+  lives-ok { $vv2 = $vv.subvector-stride($v1, 0, 2, 3) }, 'create subvector with stride';
   $vv2.setall(12);
   is-deeply $v1[^10], ((12e0, 1e0) xx 3, 1e0 xx 4).flat, 'modify vector using subvector with stride';
   my Math::Libgsl::Vector::Complex64 $cv .= new(:size(10));
@@ -66,11 +67,24 @@ subtest {
   lives-ok { $cv.setall(1+2i) }, 'set all elements to complex values';
   is-deeply $cv[^10], (1+2i xx 10), 'all complex elements set';
   my Math::Libgsl::Vector $vv5;
-  lives-ok { $vv5 = $cv.complex64-real($vv) }, 'create real view from complex vector';
+  my Math::Libgsl::Vector::Complex64::View $cvv .= new;
+  lives-ok { $vv5 = $cvv.real($cv) }, 'create real view from complex vector';
   is-deeply $vv5[^10], (1e0 xx 10).flat, 'verify real view';
   my Math::Libgsl::Vector $vv6;
-  lives-ok { $vv6 = $cv.complex64-imag($vv) }, 'create imag view from complex vector';
+  lives-ok { $vv6 = $cvv.imag($cv) }, 'create imag view from complex vector';
   is-deeply $vv6[^10], (2e0 xx 10).flat, 'verify imag view';
+  my @a = 1 xx 10;
+  my Math::Libgsl::Vector $vv3;
+  my $array = prepvec(@a);
+  lives-ok { $vv3 = $vv.array($array) }, 'create array using vector view';
+  is-deeply $vv3[^10], (1e0 xx 10).flat, 'verify array using vector view';
+  $vv3[0] = 2;
+  ok $array[0] == 2, 'changing view results in a changed array';
+  $array[0] = 1e0;
+  my Math::Libgsl::Vector $vv4;
+  lives-ok { $vv4 = $vv.array-stride($array, 2) }, 'create array with stride using vector view';
+  is-deeply $vv4[^5], (1e0 xx 5).flat, 'verify array with stride using vector view';
+  lives-ok { $array = num64-prepvec(@a) }, 'num64-prepvec alias works';
 }, 'views';
 
 subtest {
