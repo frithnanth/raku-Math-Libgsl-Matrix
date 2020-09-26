@@ -70,6 +70,9 @@ method setall(Complex(Cool) $x!) {
 }
 method zero() { gsl_matrix_complex_float_set_zero($!matrix); self }
 method identity() { gsl_matrix_complex_float_set_identity($!matrix); self }
+method size(--> List) { self.matrix.size1, self.matrix.size2 }
+method size1(--> UInt) { self.matrix.size1 }
+method size2(--> UInt) { self.matrix.size2 }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_matrix_complex_float_fwrite($filename, $!matrix);
@@ -97,11 +100,10 @@ method submatrix(Math::Libgsl::Matrix::Complex32::View $mv, size_t $k1 where * <
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix::Complex32.new: matrix => mgsl_matrix_complex_float_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-vector(Math::Libgsl::Matrix::Complex32::View $mv, Math::Libgsl::Vector::Complex32 $v, size_t $n1, size_t $n2) is export(:withsub) {
+sub complex32-mat-view-vector(Math::Libgsl::Matrix::Complex32::View $mv, Math::Libgsl::Vector::Complex32 $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::Complex32) is export {
   Math::Libgsl::Matrix::Complex32.new: matrix => mgsl_matrix_complex_float_view_vector($mv.view, $v.vector, $n1, $n2);
 }
-sub mat-view-vector-tda(Math::Libgsl::Matrix::Complex32::View $mv, Math::Libgsl::Vector::Complex32 $v, size_t $n1, size_t $n2, size_t $tda) is export(:withsub) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $n2 > $tda ;
+sub complex32-mat-view-vector-tda(Math::Libgsl::Matrix::Complex32::View $mv, Math::Libgsl::Vector::Complex32 $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix::Complex32) is export {
   Math::Libgsl::Matrix::Complex32.new: matrix => mgsl_matrix_complex_float_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
 }
 method row-view(Math::Libgsl::Vector::Complex32::View $vv, size_t $i where * < $!matrix.size1) {
@@ -124,6 +126,15 @@ method subdiagonal-view(Math::Libgsl::Vector::Complex32::View $vv, size_t $k whe
 }
 method superdiagonal-view(Math::Libgsl::Vector::Complex32::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
   Math::Libgsl::Vector::Complex32.new: vector => mgsl_matrix_complex_float_superdiagonal($vv.view, $!matrix, $k);
+}
+sub complex32-prepmat(@array --> CArray[num32]) is export {
+  my CArray[num32] $array .= new: @array».Num;
+}
+sub complex32-mat-view-array(Math::Libgsl::Matrix::Complex32::View $mv, $array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix::Complex32) is export {
+  Math::Libgsl::Matrix::Complex32.new: matrix => mgsl_matrix_complex_float_view_array($mv.view, $array, $size1, ($size2 / 2).Int);
+}
+sub complex32-mat-view-array-tda(Math::Libgsl::Matrix::Complex32::View $mv, $array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix::Complex32) is export {
+  Math::Libgsl::Matrix::Complex32.new: matrix => mgsl_matrix_complex_float_view_array_with_tda($mv.view, $array, $size1, ($size2 / 2).Int, $tda);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix::Complex32 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {

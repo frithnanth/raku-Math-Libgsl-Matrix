@@ -48,6 +48,9 @@ method ASSIGN-POS(Math::Libgsl::Matrix::UInt16:D: Int:D $i! where * < $!matrix.s
 method setall(Num(Cool) $x!) { gsl_matrix_ushort_set_all($!matrix, $x); self }
 method zero() { gsl_matrix_ushort_set_zero($!matrix); self }
 method identity() { gsl_matrix_ushort_set_identity($!matrix); self }
+method size(--> List) { self.matrix.size1, self.matrix.size2 }
+method size1(--> UInt) { self.matrix.size1 }
+method size2(--> UInt) { self.matrix.size2 }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_matrix_ushort_fwrite($filename, $!matrix);
@@ -75,11 +78,10 @@ method submatrix(Math::Libgsl::Matrix::UInt16::View $mv, size_t $k1 where * < $!
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix::UInt16.new: matrix => mgsl_matrix_ushort_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-vector(Math::Libgsl::Matrix::UInt16::View $mv, Math::Libgsl::Vector::UInt16 $v, size_t $n1, size_t $n2) is export(:withsub) {
+sub uint16-mat-view-vector(Math::Libgsl::Matrix::UInt16::View $mv, Math::Libgsl::Vector::UInt16 $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::UInt16) is export {
   Math::Libgsl::Matrix::UInt16.new: matrix => mgsl_matrix_ushort_view_vector($mv.view, $v.vector, $n1, $n2);
 }
-sub mat-view-vector-tda(Math::Libgsl::Matrix::UInt16::View $mv, Math::Libgsl::Vector::UInt16 $v, size_t $n1, size_t $n2, size_t $tda) is export(:withsub) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $n2 > $tda ;
+sub uint16-mat-view-vector-tda(Math::Libgsl::Matrix::UInt16::View $mv, Math::Libgsl::Vector::UInt16 $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix::UInt16) is export {
   Math::Libgsl::Matrix::UInt16.new: matrix => mgsl_matrix_ushort_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
 }
 method row-view(Math::Libgsl::Vector::UInt16::View $vv, size_t $i where * < $!matrix.size1) {
@@ -102,6 +104,15 @@ method subdiagonal-view(Math::Libgsl::Vector::UInt16::View $vv, size_t $k where 
 }
 method superdiagonal-view(Math::Libgsl::Vector::UInt16::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
   Math::Libgsl::Vector::UInt16.new: vector => mgsl_matrix_ushort_superdiagonal($vv.view, $!matrix, $k);
+}
+sub uint16-prepmat(@array --> CArray[uint16]) is export {
+  my CArray[uint16] $array .= new: @array».Int;
+}
+sub uint16-mat-view-array(Math::Libgsl::Matrix::UInt16::View $mv, $array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix::UInt16) is export {
+  Math::Libgsl::Matrix::UInt16.new: matrix => mgsl_matrix_ushort_view_array($mv.view, $array, $size1, $size2);
+}
+sub uint16-mat-view-array-tda(Math::Libgsl::Matrix::UInt16::View $mv, $array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix::UInt16) is export {
+  Math::Libgsl::Matrix::UInt16.new: matrix => mgsl_matrix_ushort_view_array_with_tda($mv.view, $array, $size1, $size2, $tda);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix::UInt16 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {

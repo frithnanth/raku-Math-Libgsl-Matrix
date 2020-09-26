@@ -75,11 +75,10 @@ method submatrix(Math::Libgsl::Matrix::Int64::View $mv, size_t $k1 where * < $!m
     if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
   Math::Libgsl::Matrix::Int64.new: matrix => mgsl_matrix_long_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
 }
-sub mat-view-vector(Math::Libgsl::Matrix::Int64::View $mv, Math::Libgsl::Vector::Int64 $v, size_t $n1, size_t $n2) is export(:withsub) {
+sub int64-mat-view-vector(Math::Libgsl::Matrix::Int64::View $mv, Math::Libgsl::Vector::Int64 $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::Int64) is export {
   Math::Libgsl::Matrix::Int64.new: matrix => mgsl_matrix_long_view_vector($mv.view, $v.vector, $n1, $n2);
 }
-sub mat-view-vector-tda(Math::Libgsl::Matrix::Int64::View $mv, Math::Libgsl::Vector::Int64 $v, size_t $n1, size_t $n2, size_t $tda) is export(:withsub) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "tda out of bound" if $n2 > $tda ;
+sub int64-mat-view-vector-tda(Math::Libgsl::Matrix::Int64::View $mv, Math::Libgsl::Vector::Int64 $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix::Int64) is export {
   Math::Libgsl::Matrix::Int64.new: matrix => mgsl_matrix_long_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
 }
 method row-view(Math::Libgsl::Vector::Int64::View $vv, size_t $i where * < $!matrix.size1) {
@@ -102,6 +101,15 @@ method subdiagonal-view(Math::Libgsl::Vector::Int64::View $vv, size_t $k where *
 }
 method superdiagonal-view(Math::Libgsl::Vector::Int64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
   Math::Libgsl::Vector::Int64.new: vector => mgsl_matrix_long_superdiagonal($vv.view, $!matrix, $k);
+}
+sub int64-prepmat(@array --> CArray[int64]) is export {
+  my CArray[int64] $array .= new: @array».Int;
+}
+sub int64-mat-view-array(Math::Libgsl::Matrix::Int64::View $mv, $array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix::Int64) is export {
+  Math::Libgsl::Matrix::Int64.new: matrix => mgsl_matrix_long_view_array($mv.view, $array, $size1, $size2);
+}
+sub int64-mat-view-array-tda(Math::Libgsl::Matrix::Int64::View $mv, $array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix::Int64) is export {
+  Math::Libgsl::Matrix::Int64.new: matrix => mgsl_matrix_long_view_array_with_tda($mv.view, $array, $size1, $size2, $tda);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
