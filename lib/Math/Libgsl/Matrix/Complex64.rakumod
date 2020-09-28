@@ -13,6 +13,22 @@ class View {
   has gsl_matrix_complex_view $.view;
   submethod BUILD { $!view = alloc_gsl_matrix_complex_view }
   submethod DESTROY { free_gsl_matrix_complex_view($!view) }
+  method submatrix(Math::Libgsl::Matrix::Complex64 $m, size_t $k1 where * < $m.size1, size_t $k2 where * < $m.size2, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::Complex64) {
+    fail X::Libgsl.new: errno => GSL_EDOM, error => "Submatrix indices out of bound" if $k1 + $n1 > $m.size1 || $k2 + $n2 > $m.size2;
+    Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_submatrix($!view, $m.matrix, $k1, $k2, $n1, $n2);
+  }
+  method vector(Math::Libgsl::Vector::Complex64 $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::Complex64) {
+    Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_vector($!view, $v.vector, $n1, $n2);
+  }
+  method vector-tda(Math::Libgsl::Vector::Complex64 $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix::Complex64) {
+    Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_vector_with_tda($!view, $v.vector, $n1, $n2, $tda);
+  }
+  method array($array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix::Complex64) {
+    Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array($!view, $array, $size1, ($size2 / 2).Int);
+  }
+  method array-tda($array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix::Complex64) {
+    Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array_with_tda($!view, $array, $size1, ($size2 / 2).Int, $tda);
+  }
 }
 
 has gsl_matrix_complex $.matrix;
@@ -95,46 +111,29 @@ method scanf(Str $filename!) {
   self
 }
 # View
-method submatrix(Math::Libgsl::Matrix::Complex64::View $mv, size_t $k1 where * < $!matrix.size1, size_t $k2 where * < $!matrix.size2, size_t $n1, size_t $n2) {
-  fail X::Libgsl.new: errno => GSL_EDOM, error => "Submatrix indices out of bound"
-    if $k1 + $n1 > $!matrix.size1 || $k2 + $n2 > $!matrix.size2;
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_submatrix($mv.view, $!matrix, $k1, $k2, $n1, $n2);
-}
-sub complex64-mat-view-vector(Math::Libgsl::Matrix::Complex64::View $mv, Math::Libgsl::Vector::Complex64 $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix::Complex64) is export {
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_vector($mv.view, $v.vector, $n1, $n2);
-}
-sub complex64-mat-view-vector-tda(Math::Libgsl::Matrix::Complex64::View $mv, Math::Libgsl::Vector::Complex64 $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix::Complex64) is export {
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_vector_with_tda($mv.view, $v.vector, $n1, $n2, $tda);
-}
-method row-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $i where * < $!matrix.size1) {
+method row-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $i where * < $!matrix.size1 --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_row($vv.view, $!matrix, $i);
 }
-method col-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $j where * < $!matrix.size2) {
+method col-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $j where * < $!matrix.size2 --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_column($vv.view, $!matrix, $j);
 }
-method subrow-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $i where * < $!matrix.size1, size_t $offset, size_t $n) {
+method subrow-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $i where * < $!matrix.size1, size_t $offset, size_t $n --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_subrow($vv.view, $!matrix, $i, $offset, $n);
 }
-method subcol-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n) {
+method subcol-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_subcolumn($vv.view, $!matrix, $j, $offset, $n);
 }
-method diagonal-view(Math::Libgsl::Vector::Complex64::View $vv) {
+method diagonal-view(Math::Libgsl::Vector::Complex64::View $vv --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_diagonal($vv.view, $!matrix);
 }
-method subdiagonal-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
+method subdiagonal-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2) --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_subdiagonal($vv.view, $!matrix, $k);
 }
-method superdiagonal-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2)) {
+method superdiagonal-view(Math::Libgsl::Vector::Complex64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2) --> Math::Libgsl::Vector::Complex64) {
   Math::Libgsl::Vector::Complex64.new: vector => mgsl_matrix_complex_superdiagonal($vv.view, $!matrix, $k);
 }
 sub complex64-prepmat(@array --> CArray[num64]) is export {
   my CArray[num64] $array .= new: @array».Num;
-}
-sub complex64-mat-view-array(Math::Libgsl::Matrix::Complex64::View $mv, $array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix::Complex64) is export {
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array($mv.view, $array, $size1, ($size2 / 2).Int);
-}
-sub complex64-mat-view-array-tda(Math::Libgsl::Matrix::Complex64::View $mv, $array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix::Complex64) is export {
-  Math::Libgsl::Matrix::Complex64.new: matrix => mgsl_matrix_complex_view_array_with_tda($mv.view, $array, $size1, ($size2 / 2).Int, $tda);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix::Complex64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
