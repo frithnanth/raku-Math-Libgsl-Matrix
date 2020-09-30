@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Rewrite the View system for both Vector and Matrix
+    - Add views on Raku arrays
 
 0.2.0  2020-08-29T12:50:08+02:00
     - Sorry, *-view-*-array* subs are not reliable. Deleted until I find out a new way to implement them
