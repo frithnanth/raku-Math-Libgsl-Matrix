@@ -290,8 +290,6 @@ Math::Libgsl::Vector - An interface to libgsl, the Gnu Scientific Library - Vect
 
 =begin code :lang<perl6>
 
-use Math::Libgsl::Raw::Matrix :ALL;
-
 use Math::Libgsl::Vector;
 use Math::Libgsl::Matrix;
 
@@ -383,6 +381,10 @@ This method can be chained.
 Sets all the elements of the vector to zero except for the element at $index, which is set to one.
 This method can be chained.
 
+=head3 size(--> UInt)
+
+This method outputs the vector's size.
+
 =head3 write(Str $filename!)
 
 Writes the vector to a file in binary form.
@@ -402,31 +404,6 @@ This method can be chained.
 
 Reads the vector from a file containing formatted data.
 This method can be chained.
-
-=head3 subvector(Math::Libgsl::Vector::View $vv, size_t $offset where * < $!vector.size, size_t $n)
-
-Creates a view on a subset of the vector, starting from $offset and of length $n.
-This method returns a new Vector object.
-Any operation done on this view affects the original vector as well.
-
-Every vector view operation works following this logic:
-
-=begin code :lang<perl6>
-use Math::Libgsl::Vector;
-
-my Math::Libgsl::Vector $v1 .= new(:size(10));          # original vector
-$v1.setall(1);
-my Math::Libgsl::Vector::View $vv .= new;               # view: an object that will contain the view information
-my Math::Libgsl::Vector $v2 = $v1.subvector($vv, 0, 3); # $v2 is the vector created from the view
-$v2.setall(12);                                         # one can operate on $v2 as it is a normal vector
-say $v1[^10]; # output: (12 12 12 1 1 1 1 1 1 1)        # but every operation will affect the original vector as well
-=end code
-
-=head3 subvector-stride(Math::Libgsl::Vector::View $vv, size_t $offset where * < $!vector.size, size_t $stride, size_t $n)
-
-Creates a view on a subset of the vector, starting from $offset and of length $n, with stride $stride.
-This method returns a new Vector object.
-Any operation done on this view affects the original vector as well.
 
 =head3 copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size)
 
@@ -499,6 +476,74 @@ These methods return True if all the elements of the vector are zero, strictly p
 
 This method returns True if the two vectors are equal element-wise.
 
+=head2 Views
+
+Views are extremely handy, but their C-language interface uses a couple of low-level tricks that makes difficult to write a simple interface for high-level languages.
+A View is a reference to data inside the program, so it makes possible to work on a subset of that data without having to duplicate data in memory or do complex address calculation to access it.
+Since a View is a reference to an object, the programmer needs to take care that the original object doesn't go out of scope, or the virtual machine might deallocate its memory with negative effects on the underlying library code.
+Look in the B<examples/> directory for more programs showing what can be done with views.
+
+=head2 Vector View
+
+=begin code :lang<perl6>
+
+use Math::Libgsl::Vector;
+
+my Math::Libgsl::Vector $v .= new(30);                            # Create a 30-element vector
+my Math::Libgsl::Vector::View $vv .= new;                         # Create a Vector View
+my Math::Libgsl::Vector $v1 = $vv.subvector-stride($v, 0, 3, 10); # Get a subvector view with stride
+$v1.setall(42);                                                   # Set all elements of the subvector view to 42
+say $v[^30]; # output: (42 0 0 42 0 0 42 0 0 42 0 0 42 0 0 42 0 0 42 0 0 42 0 0 42 0 0 42 0 0)
+
+=end code
+
+There are two kinds of Vector Views: a Vector View on a Vector or a Vector View on a Raku array.
+These are Views of the first kind:
+
+=head3 subvector(Math::Libgsl::Vector $v, size_t $offset where * < $v.vector.size, size_t $n --> Math::Libgsl::Vector)
+
+Creates a view on a subset of the vector, starting from $offset and of length $n.
+This method returns a new Vector object.
+Any operation done on this view affects the original vector as well.
+
+=head3 subvector-stride(Math::Libgsl::Vector $v, size_t $offset where * < $v.vector.size, size_t $stride, size_t $n --> Math::Libgsl::Vector)
+
+Creates a view on a subset of the vector, starting from $offset and of length $n, with stride $stride.
+This method returns a new Vector object.
+Any operation done on this view affects the original vector as well.
+
+Views on a Raku array are a bit more complex, because it's not possible to simply pass a Raku array to a C-language function.
+So for this to work the programmer has to I<prepare> the array to be passed to the library. Both the View object and the I<prepared> array must not go out of scope.
+
+=begin code :lang<perl6>
+
+use Math::Libgsl::Vector;
+
+my @array = 1 xx 10;                                    # define an array
+my $parray = prepvec(@array);                           # prepare the array to be used as a Math::Libgsl::Vector
+my Math::Libgsl::Vector::View $vv .= new;               # view: an object that will contain the view information
+my Math::Libgsl::Vector $v = $vv.array($parray);        # create an Math::Libgsl::Vector object
+$v[0] = 2;                                              # assign a value to the first vector element
+say $v[^10];                                            # output: (2 1 1 1 1 1 1 1 1 1)
+
+=end code
+
+=head3 num64-prepvec(@array)
+
+This is just a sub, not a method; it gets a regular array and outputs a I<prepared> array, kept in a scalar variable.
+There are similar functions for every data type, so for example if one is working with int16 Vectors, one will use the B<int16-prepvec> sub.
+The num64, being the default data type, has a special B<prepvec> alias.
+Once I<prepared>, the original array can be discarded.
+
+=head3 array($parray --> Math::Libgsl::Vector)
+
+This method gets a I<prepared> array and returns a Math::Libgsl::Vector object.
+
+=head3 array-stride($array, size_t $stride --> Math::Libgsl::Vector)
+
+This method gets a I<prepared> array and a B<$stride> and returns a Math::Libgsl::Vector object.
+
+
 =head2 Matrix
 
 =head3 new(Int $size1!, Int $size2!)
@@ -539,6 +584,12 @@ This method can be chained.
 
 Sets all elements of the matrix to the corrisponding elements of the identity matrix.
 
+=head3 size1(--> UInt)
+=head3 size2(--> UInt)
+=head3 size(--> List)
+
+These methods return the first, second, or both the matrix sizes.
+
 =head3 write(Str $filename!)
 
 Writes the matrix to a file in binary form.
@@ -558,63 +609,6 @@ This method can be chained.
 
 Reads the matrix from a file containing formatted data.
 This method can be chained.
-
-=head3 submatrix(Math::Libgsl::Matrix::View $mv, size_t $k1 where * < $!matrix.size1, size_t $k2 where * < $!matrix.size2, size_t $n1, size_t $n2)
-
-Creates a view on a subset of the matrix, starting from coordinates ($k1, $k2) with $n1 rows and $n2 columns.
-This method returns a new Matrix object.
-Any operation done on this view affects the original matrix as well.
-
-Every matrix view operation works following this logic:
-
-=begin code :lang<perl6>
-use Math::Libgsl::Matrix;
-
-my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));     # original matrix
-$m1.setall(1);
-my Math::Libgsl::Matrix::View $mv .= new;                     # view: an object that will contain the view information
-my Math::Libgsl::Matrix $m2 = $m1.submatrix($mv, 1, 1, 2, 2); # $m2 is the matrix created from the view
-$m2.setall(12);                                               # one can operate on $m2 as it is a normal matrix
-say ($m1.get-row($_) for ^3); # $m1 affected as well; output: ([1 1 1 1] [1 12 12 1] [1 12 12 1])
-=end code
-
-=head3 mat-view-vector(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2)
-
-This is not a method, but a sub; it's not imported unless one specifies :withsub.
-It creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
-
-=head3 mat-view-vector-tda(Math::Libgsl::Matrix::View $mv, Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda)
-
-This is not a method, but a sub; it's not imported unless one specifies :withsub.
-It creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
-
-=head3 row-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1)
-
-This method creates a Vector object from row $i of the matrix.
-
-=head3 col-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2)
-
-This method creates a Vector object from column $j of the matrix.
-
-=head3 subrow-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1, size_t $offset, size_t $n)
-
-This method creates a Vector object from row $i of the matrix, starting from $offset and containing $n elements.
-
-=head3 subcol-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n)
-
-This method creates a Vector object from column $j of the matrix, starting from $offset and containing $n elements.
-
-=head3 diagonal-view(Math::Libgsl::Vector::View $vv)
-
-This method creates a Vector object from the diagonal of the matrix.
-
-=head3 subdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2))
-
-This method creates a Vector object from the subdiagonal number $k of the matrix.
-
-=head3 superdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2))
-
-This method creates a Vector object from the superdiagonal number $k of the matrix.
 
 =head3 copy(Math::Libgsl::Matrix $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2)
 
@@ -747,6 +741,119 @@ These methods return True if all the elements of the matrix are zero, strictly p
 =head3 is-equal(Math::Libgsl::Matrix $b --> Bool)
 
 This method returns True if the matrices are equal element-wise.
+
+=head2 Matrix View
+
+=begin code :lang<perl6>
+
+use Math::Libgsl::Matrix;
+
+my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));      # create a 3x4 matrix
+$m1.setall(1);                                                 # set all elements to 1 
+my Math::Libgsl::Matrix::View $mv .= new;                      # create a Matrix View
+my Math::Libgsl::Matrix $m2 = $mv.submatrix($m1, 1, 1, 2, 2);  # get a submatrix
+$m2.setall(12);                                                # set the submatrix elements to 12
+$m1.get-row($_)».fmt('%2d').put for ^3;                        # print the original matrix
+# output:
+# 1  1  1  1
+# 1 12 12  1
+# 1 12 12  1
+
+=end code
+
+There are three kinds of Matrix Views: a Matrix View on a Matrix, a Matrix View on a Vector, and a Matrix View on a Raku array.
+
+This is the View of the first kind:
+
+=head3 submatrix(Math::Libgsl::Matrix $m, size_t $k1 where * < $m.size1, size_t $k2 where * < $m.size2, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix)
+
+Creates a view on a subset of the matrix, starting from coordinates ($k1, $k2) with $n1 rows and $n2 columns.
+This method returns a new Matrix object.
+Any operation done on the returned matrix affects the original matrix as well.
+
+
+These two methods create a matrix view on a Raku array:
+
+Views on a Raku array are a bit more complex, because it's not possible to simply pass a Raku array to a C-language function.
+So for this to work the programmer has to I<prepare> the array to be passed to the library. Both the View object and the I<prepared> array must not go out of scope.
+
+=begin code :lang<perl6>
+
+use Math::Libgsl::Matrix;
+
+my @array = 1 xx 10;                                    # define an array
+my $parray = prepmat(@array);                           # prepare the array to be used as a Math::Libgsl::Matrix
+my Math::Libgsl::Matrix::View $mv .= new;               # view: an object that will contain the view information
+my Math::Libgsl::Matrix $m = $mv.array($parray, 2, 5);  # create an Math::Libgsl::Matrix object
+$m[0;0] = 2;                                            # assign a value to the first matrix element
+$m.get-row($_).put for ^2;
+# output:
+# 2 1 1 1 1
+# 1 1 1 1 1
+
+=end code
+
+=head3 num64-prepmat(@array)
+
+This is just a sub, not a method; it gets a regular array and outputs a I<prepared> array, kept in a scalar variable.
+There are similar functions for every data type, so for example if one is working with int16 Vectors, one will use the B<int16-prepmat> sub.
+The num64, being the default data type, has a special B<prepmat> alias.
+Once I<prepared>, the original array can be discarded.
+
+=head3 array($array, UInt $size1, UInt $size2 --> Math::Libgsl::Matrix)
+
+This method gets a I<prepared> array and returns a Math::Libgsl::Matrix object.
+
+=head3 array-tda($array, UInt $size1, UInt $size2, size_t $tda where * > $size2 --> Math::Libgsl::Matrix)
+
+This method gets a I<prepared> array with a number of physical columns B<$tda>, which may differ from the corresponding dimension of the matrix, and returns a Math::Libgsl::Matrix object.
+
+
+These two methods create a Matrix View on a Vector:
+
+=head3 vector(Math::Libgsl::Vector $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix)
+
+This method creates a Matrix object from a Vector object. The resultimg matrix will have $n1 rows and $n2 columns.
+
+=head3 vector-tda(Math::Libgsl::Vector $v, size_t $n1, size_t $n2, size_t $tda where * > $n2 --> Math::Libgsl::Matrix)
+
+This method creates a Matrix object from a Vector object, with a physical number of columns $tda which may differ from the correspondig dimension of the matrix. The resultimg matrix will have $n1 rows and $n2 columns.
+
+
+=head2 Vector View on a Matrix
+
+There is a fourth kind of View that involves a Matrix: a Vector View on a Matrix.
+The following are methods of the Matrix class, not of the Matrix::View class, take a Vector::View argument, and deliver a Vector object.
+The Matrix object must not go out of scope while one is operating on the resulting Vector.
+
+=head3 row-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1 --> Math::Libgsl::Vector)
+
+This method creates a Vector object from row $i of the matrix.
+
+=head3 col-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2 --> Math::Libgsl::Vector)
+
+This method creates a Vector object from column $j of the matrix.
+
+=head3 subrow-view(Math::Libgsl::Vector::View $vv, size_t $i where * < $!matrix.size1, size_t $offset, size_t $n --> Math::Libgsl::Vector)
+
+This method creates a Vector object from row $i of the matrix, starting from $offset and containing $n elements.
+
+=head3 subcol-view(Math::Libgsl::Vector::View $vv, size_t $j where * < $!matrix.size2, size_t $offset, size_t $n --> Math::Libgsl::Vector)
+
+This method creates a Vector object from column $j of the matrix, starting from $offset and containing $n elements.
+
+=head3 diagonal-view(Math::Libgsl::Vector::View $vv --> Math::Libgsl::Vector)
+
+This method creates a Vector object from the diagonal of the matrix.
+
+=head3 subdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2) --> Math::Libgsl::Vector)
+
+This method creates a Vector object from the subdiagonal number $k of the matrix.
+
+=head3 superdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2) --> Math::Libgsl::Vector)
+
+This method creates a Vector object from the superdiagonal number $k of the matrix.
+
 
 =head1 C Library Documentation
 
