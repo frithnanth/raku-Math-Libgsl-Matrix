@@ -1,6 +1,5 @@
 #!/usr/bin/env raku
 
-use lib 'lib';
 use Math::Libgsl::Vector;
 
 # Create a 30-element vector

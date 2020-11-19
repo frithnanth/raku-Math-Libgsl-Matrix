@@ -1,6 +1,5 @@
 #!/usr/bin/env raku
 
-use lib 'lib';
 use Math::Libgsl::Matrix;
 use Math::Libgsl::BLAS;
 
