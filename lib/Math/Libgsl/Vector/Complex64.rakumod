@@ -117,8 +117,20 @@ method scanf(Str $filename!) {
   self
 }
 # View
-sub complex64-prepvec(@array) is export {
+sub complex64-prepvec(*@array) is export {
   my CArray[num64] $array .= new: @array».Num;
+}
+sub complex64-array-vec(Block $bl, *@data) is export {
+  my CArray[num64] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::Complex64::View $vv .= new;
+  my $v = $vv.array($carray);
+  $bl($v);
+}
+sub complex64-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  my CArray[num64] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::Complex64::View $vv .= new;
+  my $v = $vv.array-stride($carray, $stride);
+  $bl($v);
 }
 # Copy
 method copy(Math::Libgsl::Vector::Complex64 $src where $!vector.size == .vector.size) {

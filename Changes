@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Add a new interface to views on Raku arrays: use an array as a Vector or Matrix inside a closure
 
 0.3.0  2020-09-30T12:57:11+01:00
     - Rewrite the View system for both Vector and Matrix

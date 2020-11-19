@@ -84,11 +84,29 @@ method scanf(Str $filename!) {
   self
 }
 # View
-sub prepvec(@array) is export {
+sub prepvec(*@array) is export {
   my CArray[num64] $array .= new: @array».Num;
 }
-sub num64-prepvec(@array) is export {
+sub num64-prepvec(*@array) is export {
   prepvec(@array);
+}
+sub array-vec(Block $bl, *@data) is export {
+  my CArray[num64] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::View $vv .= new;
+  my $v = $vv.array($carray);
+  $bl($v);
+}
+sub num64-array-vec(Block $bl, *@data) is export {
+  array-vec($bl, @data);
+}
+sub array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  my CArray[num64] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::View $vv .= new;
+  my $v = $vv.array-stride($carray, $stride);
+  $bl($v);
+}
+sub num64-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  array-stride-vec($bl, $stride, @data);
 }
 # Copy
 method copy(Math::Libgsl::Vector $src where $!vector.size == .vector.size) {

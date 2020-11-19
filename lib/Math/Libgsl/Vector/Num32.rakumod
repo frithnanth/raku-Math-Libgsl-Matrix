@@ -84,8 +84,20 @@ method scanf(Str $filename!) {
   self
 }
 # View
-sub num32-prepvec(@array) is export {
+sub num32-prepvec(*@array) is export {
   my CArray[num32] $array .= new: @array».Num;
+}
+sub num32-array-vec(Block $bl, *@data) is export {
+  my CArray[num32] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::Num32::View $vv .= new;
+  my $v = $vv.array($carray);
+  $bl($v);
+}
+sub num32-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  my CArray[num64] $carray .= new: @data».Num;
+  my Math::Libgsl::Vector::Num32::View $vv .= new;
+  my $v = $vv.array-stride($carray, $stride);
+  $bl($v);
 }
 # Copy
 method copy(Math::Libgsl::Vector::Num32 $src where $!vector.size == .vector.size) {

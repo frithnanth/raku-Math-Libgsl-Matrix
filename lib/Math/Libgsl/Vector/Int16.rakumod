@@ -84,8 +84,20 @@ method scanf(Str $filename!) {
   self
 }
 # View
-sub int16-prepvec(@array) is export {
+sub int16-prepvec(*@array) is export {
   my CArray[int16] $array .= new: @array».Int;
+}
+sub int16-array-vec(Block $bl, *@data) is export {
+  my CArray[int16] $carray .= new: @data».Int;
+  my Math::Libgsl::Vector::Int16::View $vv .= new;
+  my $v = $vv.array($carray);
+  $bl($v);
+}
+sub int16-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  my CArray[int16] $carray .= new: @data».Int;
+  my Math::Libgsl::Vector::Int16::View $vv .= new;
+  my $v = $vv.array-stride($carray, $stride);
+  $bl($v);
 }
 # Copy
 method copy(Math::Libgsl::Vector::Int16 $src where $!vector.size == .vector.size) {

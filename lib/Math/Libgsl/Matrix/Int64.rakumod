@@ -107,8 +107,20 @@ method subdiagonal-view(Math::Libgsl::Vector::Int64::View $vv, size_t $k where *
 method superdiagonal-view(Math::Libgsl::Vector::Int64::View $vv, size_t $k where * < min($!matrix.size1, $!matrix.size2) --> Math::Libgsl::Vector::Int64) {
   Math::Libgsl::Vector::Int64.new: vector => mgsl_matrix_long_superdiagonal($vv.view, $!matrix, $k);
 }
-sub int64-prepmat(@array --> CArray[int64]) is export {
+sub int64-prepmat(*@array --> CArray[int64]) is export {
   my CArray[int64] $array .= new: @array».Int;
+}
+sub int64-array-mat(Block $bl, UInt $size1, UInt $size2, *@data) is export {
+  my CArray[int64] $carray .= new: @data».Int;
+  my Math::Libgsl::Matrix::Int64::View $mv .= new;
+  my $m = $mv.array($carray, $size1, $size2);
+  $bl($m);
+}
+sub int64-array-tda-mat(Block $bl, UInt $size1, UInt $size2, size_t $tda where * > $size2, *@data) is export {
+  my CArray[int64] $carray .= new: @data».Int;
+  my Math::Libgsl::Matrix::Int64::View $mv .= new;
+  my $m = $mv.array-tda($carray, $size1, $size2, $tda);
+  $bl($m);
 }
 # Copying matrices
 method copy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {

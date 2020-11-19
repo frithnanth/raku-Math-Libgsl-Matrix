@@ -85,6 +85,21 @@ subtest {
   lives-ok { $vv4 = $vv.array-stride($array, 2) }, 'create array with stride using vector view';
   is-deeply $vv4[^5], (1e0 xx 5).flat, 'verify array with stride using vector view';
   lives-ok { $array = num64-prepvec(@a) }, 'num64-prepvec alias works';
+  my $list := 1 xx 10;
+  my Math::Libgsl::Vector $v;
+  array-vec(-> $vec { $v = $vec; $v[1] = 2 }, $list);
+  is-deeply $v[^10], (1e0, 2e0, |(1e0 xx 8)), 'list view as a closure';
+  array-vec(sub ($vec) { $v = $vec; $v[0] = 2 }, $list);
+  is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'list view as an anomymous sub';
+  my @array = 1 xx 10;
+  array-vec(-> $vec { $v = $vec; $v[1] = 2 }, @array);
+  is-deeply $v[^10], (1e0, 2e0, |(1e0 xx 8)), 'array view as a closure';
+  num64-array-vec(sub ($vec) { $v = $vec; $v[0] = 2 }, @array);
+  is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'of array view as an anomymous sub';
+  array-vec(sub ($vec) { $v = $vec; $v[0] = 2 }, @array);
+  is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'alias array view as an anomymous sub';
+  array-stride-vec(-> $vec { $v = $vec; $v[0] = 2 }, 2, @array);
+  is-deeply $v[^5], (2e0, |(1e0 xx 4)), 'array view with stride as a closure';
 }, 'views';
 
 subtest {

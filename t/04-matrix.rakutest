@@ -96,6 +96,17 @@ subtest {
   $array = num64-prepmat @a;
   $m2 = $mv1.array($array, 2, 3);
   is-deeply ($m2.get-row($_) for ^2).flat, (1e0..6e0).flat, 'num64-prepmat works';
+  my $list := (1, 2, 3, 4, 5, 6);
+  my Math::Libgsl::Matrix $matrix .= new: 2, 3;
+  array-mat(-> $mat { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, $list);
+  is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0..6e0).flat, 'matrix view of a list as a closure';
+  my @array = 1, 2, 3, 4, 5, 6;
+  array-mat(sub ($mat) { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, @array);
+  is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0..6e0).flat, 'matrix view of an array as an anonymous sub';
+  array-tda-mat(-> $mat { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, 4, @array);
+  is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0, 3e0, 5e0, 6e0, 0e0).flat, 'matrix view of an array with tda';
+  array-tda-mat(-> $mat { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, 4, $list);
+  is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0, 3e0, 5e0, 6e0, 0e0).flat, 'matrix view of a list with tda';
 }, 'views';
 
 subtest {

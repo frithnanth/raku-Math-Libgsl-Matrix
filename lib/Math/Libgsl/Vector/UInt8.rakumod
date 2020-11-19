@@ -84,8 +84,20 @@ method scanf(Str $filename!) {
   self
 }
 # View
-sub uint8-prepvec(@array) is export {
+sub uint8-prepvec(*@array) is export {
   my CArray[uint8] $array .= new: @array».Int;
+}
+sub uint8-array-vec(Block $bl, *@data) is export {
+  my CArray[uint8] $carray .= new: @data».Int;
+  my Math::Libgsl::Vector::UInt8::View $vv .= new;
+  my $v = $vv.array($carray);
+  $bl($v);
+}
+sub uint8-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
+  my CArray[uint8] $carray .= new: @data».Int;
+  my Math::Libgsl::Vector::UInt8::View $vv .= new;
+  my $v = $vv.array-stride($carray, $stride);
+  $bl($v);
 }
 # Copy
 method copy(Math::Libgsl::Vector::UInt8 $src where $!vector.size == .vector.size) {
