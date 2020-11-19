@@ -8,7 +8,7 @@ Math::Libgsl::Matrix Math::Libgsl::Vector - An interface to libgsl, the Gnu Scie
 SYNOPSIS
 ========
 
-```perl6
+```raku
 use Math::Libgsl::Vector;
 use Math::Libgsl::Matrix;
 ```
@@ -85,13 +85,13 @@ The constructor accepts one parameter: the vector's size; it can be passed as a 
 
 This method returns the value of a vector's element. It is possible to address a vector element as a Raku array element:
 
-```perl6
+```raku
 say $vector[1];
 ```
 
 or even:
 
-```perl6
+```raku
 say $vector[^10];
 ```
 
@@ -99,7 +99,7 @@ say $vector[^10];
 
 This method sets the value of a vector's element. This method can be chained. It is possible to address a vector element as a Raku array element:
 
-```perl6
+```raku
 $vector[1] = 3;
 ```
 
@@ -208,12 +208,12 @@ This method returns True if the two vectors are equal element-wise.
 Views
 -----
 
-Views are extremely handy, but their C-language interface uses a couple of low-level tricks that makes difficult to write a simple interface for high-level languages. A View is a reference to data inside the program, so it makes possible to work on a subset of that data without having to duplicate data in memory or do complex address calculation to access it. Since a View is a reference to an object, the programmer needs to take care that the original object doesn't go out of scope, or the virtual machine might deallocate its memory with negative effects on the underlying library code. Look in the **examples/** directory for more programs showing what can be done with views.
+Views are extremely handy, but their C-language interface uses a couple of low-level tricks that makes difficult to write a simple interface for high-level languages. A View is a reference to data in a Vector, Matrix, or array, so it makes possible to work on a subset of that data without having to duplicate it in memory or do complex address calculation to access it. Since a View is a reference to an object, the programmer needs to take care that the original object doesn't go out of scope, or the virtual machine might deallocate its memory causing the underlying C library to crash. Look in the **examples/** directory for more programs showing what can be done with views.
 
 Vector View
 -----------
 
-```perl6
+```raku
 use Math::Libgsl::Vector;
 
 my Math::Libgsl::Vector $v .= new(30);                            # Create a 30-element vector
@@ -235,15 +235,71 @@ Creates a view on a subset of the vector, starting from $offset and of length $n
 
 Views on a Raku array are a bit more complex, because it's not possible to simply pass a Raku array to a C-language function. So for this to work the programmer has to *prepare* the array to be passed to the library. Both the View object and the *prepared* array must not go out of scope.
 
-```perl6
+There are three ways to access a Raku array as a Math::Libgsl::Vector object:
+
+  * The hard way - use NativeCall's CArray to create a C-language-happy array.
+
+  * The easy way - use the *-prepvec sub to convert a Raku array into a C array.
+
+  * The easiest way - use the *-array-vec sub, pass it the Raku array or list and a closure or anonymous sub.
+
+This is an example of the "hard way":
+
+```raku
+use Math::Libgsl::Vector;
+use NativeCall;
+
+my CArray[num64] $array .= new: (1 xx 10)».Num;         # define a CArray
+my Math::Libgsl::Vector::View $vv .= new;               # view: an object that will contain the view information
+my Math::Libgsl::Vector $v = $vv.array($array);         # create an Math::Libgsl::Vector object
+$v[0] = 2;                                              # assign a value to the first vector element
+say $v[^10];                                            # output: (2 1 1 1 1 1 1 1 1 1)
+```
+
+This is an example of the "easy way":
+
+```raku
 use Math::Libgsl::Vector;
 
 my @array = 1 xx 10;                                    # define an array
-my $parray = prepvec(@array);                           # prepare the array to be used as a Math::Libgsl::Vector
+my $parray = num64-prepvec(@array);                     # prepare the array to be used as a Math::Libgsl::Vector
 my Math::Libgsl::Vector::View $vv .= new;               # view: an object that will contain the view information
 my Math::Libgsl::Vector $v = $vv.array($parray);        # create an Math::Libgsl::Vector object
 $v[0] = 2;                                              # assign a value to the first vector element
 say $v[^10];                                            # output: (2 1 1 1 1 1 1 1 1 1)
+```
+
+Here are some examples of the "easiest way":
+
+```raku
+use Math::Libgsl::Vector;
+
+my @array = ^10;                                                    # initialize an array
+my ($min, $max) = num64-array-vec(-> $vec { $vec.minmax }, @array); # find min and max value
+say "$min $max";                                                    # output: 0 9
+```
+
+```raku
+use Math::Libgsl::Constants;
+use Math::Libgsl::Vector;
+use Math::Libgsl::MovingWindow;
+
+my @array = ^10;                                        # initialize an array
+my Math::Libgsl::MovingWindow $mw .= new: :samples(5);  # initialize a MovingWindow object with a 5-sample window
+                                                        # compute the moving-window mean of the array
+my $w = num64-array-vec(-> $vec { $mw.mean($vec, :endtype(GSL_MOVSTAT_END_PADVALUE)) }, @array);
+say $w[^10];                                            # output: (0.6 1.2 2 3 4 5 6 7 7.8 8.4)
+```
+
+Even using this last construct, if the Vector object is to be used outside of the closure it must be declared before calling array-vec.
+
+```raku
+use Math::Libgsl::Vector;
+
+my @array = 1 xx 10;                                            # define an array
+my Math::Libgsl::Vector $v .= new: 10;                          # declare a Math::Libgsl::Vector
+num64-array-vec(-> $vec { $v.copy($vec); $v[0] = 2; }, @array); # assign a value to the first vector element
+say $v[^10];                                                    # output: (2 1 1 1 1 1 1 1 1 1)
 ```
 
 ### num64-prepvec(@array)
@@ -258,6 +314,14 @@ This method gets a *prepared* array and returns a Math::Libgsl::Vector object.
 
 This method gets a *prepared* array and a **$stride** and returns a Math::Libgsl::Vector object.
 
+### sub num64-array-vec(Block $bl, *@data)
+
+This sub arguments are a Block to execute and a regular Raku array. Internally it uses a vector view to convert the array into libgsl's own vector data type, obtains the Math::Libgsl::Vector from the View, and passes it to the Block. When the Block exits the Math::Libgsl::Vector object ceases to exist, so it must be consumed inside the Block, or copied into another externally defined variable. The num64, being the default data type, has a special **array-vec** alias.
+
+### sub num64-array-stride-vec(Block $bl, size_t $stride, *@data)
+
+This sub arguments are a Block to execute, a stride, and a regular Raku array. Internally it uses a vector view to convert the array into libgsl's own vector data type, obtains the Math::Libgsl::Vector from the View, and passes it to the Block. When the Block exits the Math::Libgsl::Vector object ceases to exist, so it must be consumed inside the Block, or copied into another externally defined variable. The num64, being the default data type, has a special **array-stride-vec** alias.
+
 Matrix
 ------
 
@@ -271,7 +335,7 @@ The constructor accepts two parameters: the matrix sizes; they can be passed as 
 
 This method returns the value of a matrix element. It is possible to address a matrix element as a Raku shaped array element:
 
-```perl6
+```raku
 say $matrix[1;2];
 ```
 
@@ -279,7 +343,7 @@ say $matrix[1;2];
 
 This method sets the value of a matrix element. This method can be chained. It is possible to address a matrix element as a Raku shaped array element:
 
-```perl6
+```raku
 $matrix[1;3] = 3;
 ```
 
@@ -436,11 +500,11 @@ This method returns True if the matrices are equal element-wise.
 Matrix View
 -----------
 
-```perl6
+```raku
 use Math::Libgsl::Matrix;
 
 my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));      # create a 3x4 matrix
-$m1.setall(1);                                                 # set all elements to 1 
+$m1.setall(1);                                                 # set all elements to 1
 my Math::Libgsl::Matrix::View $mv .= new;                      # create a Matrix View
 my Math::Libgsl::Matrix $m2 = $mv.submatrix($m1, 1, 1, 2, 2);  # get a submatrix
 $m2.setall(12);                                                # set the submatrix elements to 12
@@ -459,11 +523,37 @@ This is the View of the first kind:
 
 Creates a view on a subset of the matrix, starting from coordinates ($k1, $k2) with $n1 rows and $n2 columns. This method returns a new Matrix object. Any operation done on the returned matrix affects the original matrix as well.
 
-These two methods create a matrix view on a Raku array:
+These three methods create a matrix view on a Raku array:
+
+There are three ways to view a Raku array as a Math::Libgsl::Vector object:
+
+  * The hard way - use NativeCall's CArray to create a C-language-happy array.
+
+  * The easy way - use the *-prepvec sub to convert a Raku array into a C array.
+
+  * The easiest way - use the *-array-vec sub, pass it the Raku array or list and a closure or anonymous sub.
+
+This is an example of the "hard way":
+
+```raku
+use Math::Libgsl::Matrix;
+use NativeCall;
+
+my CArray[num64] $array .= new: (1..6)».Num;            # define a CArray
+my Math::Libgsl::Matrix::View $mv .= new;               # view: an object that will contain the view information
+my Math::Libgsl::Matrix $m = $mv.array($array, 2, 3);   # create an Math::Libgsl::Matrix object
+$m[0;0] = 2;                                            # assign a value to the first matrix element
+say $m.get-row($_) for ^2;
+# output:
+# 2 2 3
+# 4 5 6
+```
+
+This is an example of the "easy way":
 
 Views on a Raku array are a bit more complex, because it's not possible to simply pass a Raku array to a C-language function. So for this to work the programmer has to *prepare* the array to be passed to the library. Both the View object and the *prepared* array must not go out of scope.
 
-```perl6
+```raku
 use Math::Libgsl::Matrix;
 
 my @array = 1 xx 10;                                    # define an array
@@ -475,6 +565,20 @@ $m.get-row($_).put for ^2;
 # output:
 # 2 1 1 1 1
 # 1 1 1 1 1
+```
+
+This is an example of the "easiest way":
+
+```raku
+use Math::Libgsl::Matrix;
+
+my @array = 1..6;                                                                 # initialize an array
+my Math::Libgsl::Matrix $matrix .= new: 2, 3;                                     # declare a Math::Libgsl::Matrix
+num64-array-mat(-> $mat { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, @array);  # assign 0 to matrix element [0;0]
+$matrix.get-row($_).put for ^2;
+# output:
+# 0 2 3
+# 4 5 6
 ```
 
 ### num64-prepmat(@array)
@@ -489,7 +593,15 @@ This method gets a *prepared* array and returns a Math::Libgsl::Matrix object.
 
 This method gets a *prepared* array with a number of physical columns **$tda**, which may differ from the corresponding dimension of the matrix, and returns a Math::Libgsl::Matrix object.
 
-These two methods create a Matrix View on a Vector:
+### sub num64-array-mat(Block $bl, UInt $size1, UInt $size2, *@data)
+
+This sub arguments are a Block to execute, the sizes of the desired resulting matrix, and a regular Raku array. Internally it uses a matrix view to convert the array into libgsl's own matrix data type, obtains the Math::Libgsl::Matrix from the View, and passes it to the Block. When the Block exits the Math::Libgsl::Matrix object ceases to exist, so it must be consumed inside the Block, or copied into another externally defined variable. The num64, being the default data type, has a special **array-mat** alias.
+
+### sub num64-array-tda-mat(Block $bl, UInt $size1, UInt $size2, size_t $tda where * > $size2, *@data)
+
+This sub arguments are a Block to execute, the sizes of the desired resulting matrix, the number of physical columns **$tda**, and a regular Raku array. Internally it uses a matrix view to convert the array into libgsl's own matrix data type, obtains the Math::Libgsl::Matrix from the View, and passes it to the Block. When the Block exits the Math::Libgsl::Matrix object ceases to exist, so it must be consumed inside the Block, or copied into another externally defined variable. The num64, being the default data type, has a special **array-tda-mat** alias.
+
+There are two methods to create a Matrix View on a Vector:
 
 ### vector(Math::Libgsl::Vector $v, size_t $n1, size_t $n2 --> Math::Libgsl::Matrix)
 
