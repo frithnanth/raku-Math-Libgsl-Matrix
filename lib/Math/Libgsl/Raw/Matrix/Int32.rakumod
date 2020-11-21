@@ -1,6 +1,6 @@
 use v6;
 
-unit module Math::Libgsl::Raw::Matrix::Int32:ver<0.3.0>:auth<cpan:FRITH>;
+unit module Math::Libgsl::Raw::Matrix::Int32:ver<0.3.1>:auth<cpan:FRITH>;
 
 use NativeCall;
 
