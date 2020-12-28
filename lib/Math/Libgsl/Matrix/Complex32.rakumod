@@ -171,17 +171,19 @@ method tricpy(Math::Libgsl::Matrix::Complex32 $src where $!matrix.size1 == .matr
 # Rows and columns
 method get-row(Int:D $i where * < $!matrix.size1) {
   my gsl_vector_complex_float $v = gsl_vector_complex_float_calloc($!matrix.size2);
-  LEAVE { gsl_vector_complex_float_free($v) }
+  my $c = alloc_gsl_complex;
+  LEAVE { gsl_vector_complex_float_free($v); free_gsl_complex($c) }
   my $ret = gsl_matrix_complex_float_get_row($v, $!matrix, $i);
   fail X::Libgsl.new: errno => $ret, error => "Can't get row" if $ret ≠ GSL_SUCCESS;
-  my @row = gather take mgsl_vector_complex_float_get($v, $_) for ^$!matrix.size2;
+  my @row = gather for ^$!matrix.size2 { mgsl_vector_complex_float_get($v, $_, $c); take $c.dat[0] + $c.dat[1] * i };
 }
 method get-col(Int:D $j where * < $!matrix.size2) {
   my gsl_vector_complex_float $v = gsl_vector_complex_float_calloc($!matrix.size1);
-  LEAVE { gsl_vector_complex_float_free($v) }
+  my $c = alloc_gsl_complex;
+  LEAVE { gsl_vector_complex_float_free($v); free_gsl_complex($c) }
   my $ret = gsl_matrix_complex_float_get_col($v, $!matrix, $j);
   fail X::Libgsl.new: errno => $ret, error => "Can't get col" if $ret ≠ GSL_SUCCESS;
-  my @col = gather take mgsl_vector_complex_float_get($v, $_) for ^$!matrix.size1;
+  my @col = gather for ^$!matrix.size2 { mgsl_vector_complex_float_get($v, $_, $c); take $c.dat[0] + $c.dat[1] * i };
 }
 multi method set-row(Int:D $i where * ≤ $!matrix.size1, @row where *.elems == $!matrix.size2) {
   my gsl_vector_complex_float $v = gsl_vector_complex_float_calloc($!matrix.size2);
