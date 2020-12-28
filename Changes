@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+
+0.3.2  2020-12-28T13:33:02+01:00
     - Fix complex get-row and get-col
 
 0.3.1  2020-11-21T12:59:06+01:00
