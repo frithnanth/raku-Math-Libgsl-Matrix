@@ -114,9 +114,7 @@ method superdiagonal-view(Math::Libgsl::Vector::View $vv, size_t $k where * < mi
 sub prepmat(*@array --> CArray[num64]) is export {
   my CArray[num64] $array .= new: @array».Num;
 }
-sub num64-prepmat(*@array --> CArray[num64]) is export {
-  prepmat(@array);
-}
+our &num64-prepmat is export = &prepmat;
 sub array-mat(Block $bl, UInt $size1, UInt $size2, *@data) is export {
   my CArray[num64] $carray .= new: @data».Num;
   my Math::Libgsl::Matrix::View $mv .= new;

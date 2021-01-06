@@ -87,9 +87,7 @@ method scanf(Str $filename!) {
 sub prepvec(*@array) is export {
   my CArray[num64] $array .= new: @array».Num;
 }
-sub num64-prepvec(*@array) is export {
-  prepvec(@array);
-}
+our &num64-prepvec is export = &prepvec;
 sub array-vec(Block $bl, *@data) is export {
   my CArray[num64] $carray .= new: @data».Num;
   my Math::Libgsl::Vector::View $vv .= new;
