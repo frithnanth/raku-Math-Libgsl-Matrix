@@ -95,7 +95,7 @@ subtest {
   array-vec(-> $vec { $v = $vec; $v[1] = 2 }, @array);
   is-deeply $v[^10], (1e0, 2e0, |(1e0 xx 8)), 'array view as a closure';
   num64-array-vec(sub ($vec) { $v = $vec; $v[0] = 2 }, @array);
-  is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'of array view as an anomymous sub';
+  is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'array view as an anomymous sub';
   array-vec(sub ($vec) { $v = $vec; $v[0] = 2 }, @array);
   is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'alias array view as an anomymous sub';
   array-stride-vec(-> $vec { $v = $vec; $v[0] = 2 }, 2, @array);
