@@ -83,8 +83,10 @@ sub gsl_vector_short_add(gsl_vector_short $a, gsl_vector_short $b --> int32) is 
 sub gsl_vector_short_sub(gsl_vector_short $a, gsl_vector_short $b --> int32) is native(&LIB) is export(:vectorop) { * }
 sub gsl_vector_short_mul(gsl_vector_short $a, gsl_vector_short $b --> int32) is native(&LIB) is export(:vectorop) { * }
 sub gsl_vector_short_div(gsl_vector_short $a, gsl_vector_short $b --> int32) is native(&LIB) is export(:vectorop) { * }
-sub gsl_vector_short_scale(gsl_vector_short $a, num64 $x --> int32) is native(&LIB) is export(:vectorop) { * }
-sub gsl_vector_short_add_constant(gsl_vector_short $a, num64 $x --> int32) is native(&LIB) is export(:vectorop) { * }
+sub gsl_vector_short_scale(gsl_vector_short $a, int16 $x --> int32) is native(&LIB) is export(:vectorop) { * }
+sub gsl_vector_short_add_constant(gsl_vector_short $a, int16 $x --> int32) is native(&LIB) is export(:vectorop) { * }
+sub gsl_vector_short_sum(gsl_vector_short $a --> int16) is native(&LIB) is export(:vectorop) { * } # v. 2.7
+sub gsl_vector_short_axpby(int16 $alpha, gsl_vector_short $x, int16 $beta, gsl_vector_short $y --> int32) is native(&LIB) is export(:vectorop) { * } # v. 2.7
 # Finding maximum and minimum elements of vectors
 sub gsl_vector_short_max(gsl_vector_short $v --> int16) is native(&LIB) is export(:vectorminmax) { * }
 sub gsl_vector_short_min(gsl_vector_short $v --> int16) is native(&LIB) is export(:vectorminmax) { * }
@@ -152,6 +154,8 @@ sub gsl_matrix_short_sub(gsl_matrix_short $a, gsl_matrix_short $b --> int32) is 
 sub gsl_matrix_short_mul_elements(gsl_matrix_short $a, gsl_matrix_short $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_short_div_elements(gsl_matrix_short $a, gsl_matrix_short $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_short_scale(gsl_matrix_short $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
+sub gsl_matrix_short_scale_rows(gsl_matrix_short $a, gsl_vector_short $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
+sub gsl_matrix_short_scale_columns(gsl_matrix_short $a, gsl_vector_short $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
 sub gsl_matrix_short_add_constant(gsl_matrix_short $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_short_add_diagonal(gsl_matrix_short $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 # Finding maximum and minimum elements of matrices
@@ -167,3 +171,4 @@ sub gsl_matrix_short_ispos(gsl_matrix_short $m --> int32) is native(&LIB) is exp
 sub gsl_matrix_short_isneg(gsl_matrix_short $m --> int32) is native(&LIB) is export(:matrixprop) { * }
 sub gsl_matrix_short_isnonneg(gsl_matrix_short $m --> int32) is native(&LIB) is export(:matrixprop) { * }
 sub gsl_matrix_short_equal(gsl_matrix_short $a, gsl_matrix_short $b --> int32) is native(&LIB) is export(:matrixprop) { * }
+sub gsl_matrix_short_norm1(gsl_matrix_short $a --> int16) is native(&LIB) is export(:matrixprop) { * } # v. 2.7

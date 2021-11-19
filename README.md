@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/frithnanth/raku-Math-Libgsl-Matrix.svg?branch=master)](https://travis-ci.org/frithnanth/raku-Math-Libgsl-Matrix) [![Actions Status](https://github.com/frithnanth/raku-Math-Libgsl-Matrix/workflows/test/badge.svg)](https://github.com/frithnanth/raku-Math-Libgsl-Matrix/actions)
+[![Actions Status](https://github.com/frithnanth/raku-Math-Libgsl-Matrix/workflows/test/badge.svg)](https://github.com/frithnanth/raku-Math-Libgsl-Matrix/actions)
 
 NAME
 ====
@@ -169,7 +169,15 @@ This method multiplies the elements of the vector by a factor $x. This method ca
 
 ### add-constant(Num(Cool) $x)
 
-This method add a constant to the elements of the vector. This method can be chained.
+This method adds a constant to the elements of the vector. This method can be chained.
+
+### sum(--> Num)
+
+This method returns the sum of the elements of the vector. This method fails if the underlying C library's version is less than 2.7.
+
+### axpby(Num(Cool) $alpha, Num(Cool) $beta, Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+This method performs the operation αx + βy and returns the result in the vector $b. This method can be chained. This method fails if the underlying C library's version is less than 2.7.
 
 ### max(--> Num)
 
@@ -459,6 +467,14 @@ This method divides the current matrix by another one element-wise. This method 
 
 This method multiplies the elements of the current matrix by a constant value. This method can be chained.
 
+### scale-rows(Math::Libgsl::Vector $x where .size == $!matrix.size1)
+
+This method scales the rows of the M-by-N matrix by the elements of the vector $x, of length N. The i-th row of the matrix is multiplied by $xᵢ. This method can be chained. This method fails if the underlying C library's version is less than 2.7.
+
+### scale-columns(Math::Libgsl::Vector $x where .size == $!matrix.size1)
+
+This method scales the columns of the M-by-N matrix by the elements of the vector $x, of length N. The j-th column of the matrix is multiplied by $xⱼ. This method can be chained. This method fails if the underlying C library's version is less than 2.7.
+
 ### add-constant(Num(Cool) $x)
 
 This method adds a constant to the elements of the current matrix. This method can be chained.
@@ -496,6 +512,10 @@ These methods return True if all the elements of the matrix are zero, strictly p
 ### is-equal(Math::Libgsl::Matrix $b --> Bool)
 
 This method returns True if the matrices are equal element-wise.
+
+### norm1(--> Num)
+
+This method returns the 1-norm of the m-by-n matrix, defined as the maximum column sum. This method fails if the underlying C library's version is less than 2.7.
 
 Matrix View
 -----------

@@ -143,12 +143,15 @@ sub gsl_matrix_complex_float_swap_rowcol(gsl_matrix_complex_float $m, size_t $i,
 sub gsl_matrix_complex_float_transpose_memcpy(gsl_matrix_complex_float $dest, gsl_matrix_complex_float $src --> int32) is native(&LIB) is export(:matrixexch) { * }
 sub gsl_matrix_complex_float_transpose(gsl_matrix_complex_float $m --> int32) is native(&LIB) is export(:matrixexch) { * }
 sub gsl_matrix_complex_float_transpose_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_complex_float $dest, gsl_matrix_complex_float $src --> int32) is native(&LIB) is export(:matrixexch) { * }
+sub gsl_matrix_complex_float_conjtrans_memcpy(gsl_matrix_complex_float $dest, gsl_matrix_complex_float $src --> int32) is native(&LIB) is export(:matrixexch) { * } # v. 2.7
 # Matrix operations
 sub gsl_matrix_complex_float_add(gsl_matrix_complex_float $a, gsl_matrix_complex_float $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_float_sub(gsl_matrix_complex_float $a, gsl_matrix_complex_float $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_float_mul_elements(gsl_matrix_complex_float $a, gsl_matrix_complex_float $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_float_div_elements(gsl_matrix_complex_float $a, gsl_matrix_complex_float $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_float_scale(gsl_matrix_complex_float $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
+sub gsl_matrix_complex_float_scale_rows(gsl_matrix_complex_float $a, gsl_vector_complex_float $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
+sub gsl_matrix_complex_float_scale_columns(gsl_matrix_complex_float $a, gsl_vector_complex_float $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
 sub gsl_matrix_complex_float_add_constant(gsl_matrix_complex_float $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_float_add_diagonal(gsl_matrix_complex_float $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 # Matrix properties

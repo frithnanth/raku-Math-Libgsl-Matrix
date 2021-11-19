@@ -152,6 +152,16 @@ method add-constant(Int(Cool) $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to the elements" if $ret ≠ GSL_SUCCESS;
   self
 }
+method sum(--> Int) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in sum: version < v2.7" if $gsl-version < 2.7;
+  gsl_vector_char_sum($!vector)
+}
+method axpby(Int(Cool) $alpha, Int(Cool) $beta, Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in axpby: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_vector_char_axpby($alpha, $!vector, $beta, $b.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't do axpby" if $ret ≠ GSL_SUCCESS;
+  self
+}
 # Finding maximum and minimum elements of vectors
 method max(--> Int) { gsl_vector_char_max($!vector) }
 method min(--> Int) { gsl_vector_char_min($!vector) }

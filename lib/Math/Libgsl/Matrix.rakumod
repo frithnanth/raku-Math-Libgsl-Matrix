@@ -261,6 +261,18 @@ method scale(Num(Cool) $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't scale" if $ret ≠ GSL_SUCCESS;
   self
 }
+method scale-rows(Math::Libgsl::Vector $x where .size == $!matrix.size1) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_matrix_scale_rows($!matrix, $x.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't scale-rows" if $ret ≠ GSL_SUCCESS;
+  self
+}
+method scale-columns(Math::Libgsl::Vector $x where .size == $!matrix.size2) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_matrix_scale_columns($!matrix, $x.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't scale-columns" if $ret ≠ GSL_SUCCESS;
+  self
+}
 method add-constant(Num(Cool) $x) {
   my $ret = gsl_matrix_add_constant($!matrix, $x);
   fail X::Libgsl.new: errno => $ret, error => "Can't add constant" if $ret ≠ GSL_SUCCESS;
@@ -295,6 +307,10 @@ method is-pos(--> Bool)    { gsl_matrix_ispos($!matrix)    ?? True !! False }
 method is-neg(--> Bool)    { gsl_matrix_isneg($!matrix)    ?? True !! False }
 method is-nonneg(--> Bool) { gsl_matrix_isnonneg($!matrix) ?? True !! False }
 method is-equal(Math::Libgsl::Matrix $b --> Bool) { gsl_matrix_equal($!matrix, $b.matrix) ?? True !! False }
+method norm1(--> Num) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in norm1: version < v2.7" if $gsl-version < 2.7;
+  gsl_matrix_norm1($!matrix)
+}
 
 =begin pod
 
@@ -457,8 +473,19 @@ This method can be chained.
 
 =head3 add-constant(Num(Cool) $x)
 
-This method add a constant to the elements of the vector.
+This method adds a constant to the elements of the vector.
 This method can be chained.
+
+=head3 sum(--> Num)
+
+This method returns the sum of the elements of the vector.
+This method fails if the underlying C library's version is less than 2.7.
+
+=head3 axpby(Num(Cool) $alpha, Num(Cool) $beta, Math::Libgsl::Vector $b where $!vector.size == .vector.size)
+
+This method performs the operation αx + βy and returns the result in the vector $b.
+This method can be chained.
+This method fails if the underlying C library's version is less than 2.7.
 
 =head3 max(--> Num)
 =head3 min(--> Num)
@@ -793,6 +820,18 @@ This method can be chained.
 This method multiplies the elements of the current matrix by a constant value.
 This method can be chained.
 
+=head3 scale-rows(Math::Libgsl::Vector $x where .size == $!matrix.size1)
+
+This method scales the rows of the M-by-N matrix by the elements of the vector $x, of length N. The i-th row of the matrix is multiplied by $xᵢ.
+This method can be chained.
+This method fails if the underlying C library's version is less than 2.7.
+
+=head3 scale-columns(Math::Libgsl::Vector $x where .size == $!matrix.size1)
+
+This method scales the columns of the M-by-N matrix by the elements of the vector $x, of length N. The j-th column of the matrix is multiplied by $xⱼ.
+This method can be chained.
+This method fails if the underlying C library's version is less than 2.7.
+
 =head3 add-constant(Num(Cool) $x)
 
 This method adds a constant to the elements of the current matrix.
@@ -830,6 +869,11 @@ These methods return True if all the elements of the matrix are zero, strictly p
 =head3 is-equal(Math::Libgsl::Matrix $b --> Bool)
 
 This method returns True if the matrices are equal element-wise.
+
+=head3 norm1(--> Num)
+
+This method returns the 1-norm of the m-by-n matrix, defined as the maximum column sum.
+This method fails if the underlying C library's version is less than 2.7.
 
 =head2 Matrix View
 

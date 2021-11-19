@@ -145,6 +145,15 @@ subtest {
   lives-ok { $v1.div($v2) }, 'can div';
   is-deeply $v1[^10], (4e0 xx 10), 'div';
   dies-ok { $v1.div($v3) }, "can't div vectors of different size";
+  lives-ok { $v1.scale(2e0) }, 'can scale';
+  is-deeply $v1[^10], (8e0 xx 10), 'scale';
+  lives-ok { $v1.add-constant(2e0) }, 'can add a constant';
+  is-deeply $v1[^10], (10e0 xx 10), 'add-constant';
+  if $gsl-version > 2.6 {
+    ok $v1.sum == 100, 'sum';
+    lives-ok { $v1.axpby(2e0, 3e0, $v2) }, 'can compute αx + βy';
+    is-deeply $v2[^10], (26e0 xx 10), 'axpby';
+  }
 }, 'vector operations';
 
 subtest {

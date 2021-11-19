@@ -143,12 +143,15 @@ sub gsl_matrix_complex_swap_rowcol(gsl_matrix_complex $m, size_t $i, size_t $j -
 sub gsl_matrix_complex_transpose_memcpy(gsl_matrix_complex $dest, gsl_matrix_complex $src --> int32) is native(&LIB) is export(:matrixexch) { * }
 sub gsl_matrix_complex_transpose(gsl_matrix_complex $m --> int32) is native(&LIB) is export(:matrixexch) { * }
 sub gsl_matrix_complex_transpose_tricpy(int32 $uplo_src, int32 $copy_diag, gsl_matrix_complex $dest, gsl_matrix_complex $src --> int32) is native(&LIB) is export(:matrixexch) { * }
+sub gsl_matrix_complex_conjtrans_memcpy(gsl_matrix_complex $dest, gsl_matrix_complex $src --> int32) is native(&LIB) is export(:matrixexch) { * } # v. 2.7
 # Matrix operations
 sub gsl_matrix_complex_add(gsl_matrix_complex $a, gsl_matrix_complex $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_sub(gsl_matrix_complex $a, gsl_matrix_complex $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_mul_elements(gsl_matrix_complex $a, gsl_matrix_complex $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_div_elements(gsl_matrix_complex $a, gsl_matrix_complex $b --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_scale(gsl_matrix_complex $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
+sub gsl_matrix_complex_scale_rows(gsl_matrix_complex $a, gsl_vector_complex $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
+sub gsl_matrix_complex_scale_columns(gsl_matrix_complex $a, gsl_vector_complex $x --> int32) is native(&LIB) is export(:matrixop) { * } # v. 2.7
 sub gsl_matrix_complex_add_constant(gsl_matrix_complex $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 sub gsl_matrix_complex_add_diagonal(gsl_matrix_complex $a, num64 $x --> int32) is native(&LIB) is export(:matrixop) { * }
 # Matrix properties

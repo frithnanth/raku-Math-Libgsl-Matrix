@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Add new functions from C library v. 2.7
 
 0.3.3  2021-01-15T18:28:19+01:00
     - Add true View sub aliasing

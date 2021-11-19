@@ -252,6 +252,18 @@ method scale(Num(Cool) $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't scale" if $ret ≠ GSL_SUCCESS;
   self
 }
+method scale-rows(Math::Libgsl::Vector::UInt64 $x where .size == $!matrix.size1) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_matrix_ulong_scale_rows($!matrix, $x.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't scale-rows" if $ret ≠ GSL_SUCCESS;
+  self
+}
+method scale-columns(Math::Libgsl::Vector::UInt64 $x where .size == $!matrix.size2) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_matrix_ulong_scale_columns($!matrix, $x.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't scale-columns" if $ret ≠ GSL_SUCCESS;
+  self
+}
 method add-constant(Num(Cool) $x) {
   my $ret = gsl_matrix_ulong_add_constant($!matrix, $x);
   fail X::Libgsl.new: errno => $ret, error => "Can't add constant" if $ret ≠ GSL_SUCCESS;
@@ -286,3 +298,7 @@ method is-pos(--> Bool)    { gsl_matrix_ulong_ispos($!matrix)    ?? True !! Fals
 method is-neg(--> Bool)    { gsl_matrix_ulong_isneg($!matrix)    ?? True !! False }
 method is-nonneg(--> Bool) { gsl_matrix_ulong_isnonneg($!matrix) ?? True !! False }
 method is-equal(Math::Libgsl::Matrix::UInt64 $b --> Bool) { gsl_matrix_ulong_equal($!matrix, $b.matrix) ?? True !! False }
+method norm1(--> UInt) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in norm1: version < v2.7" if $gsl-version < 2.7;
+  gsl_matrix_ulong_norm1($!matrix)
+}

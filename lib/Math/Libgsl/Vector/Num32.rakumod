@@ -147,6 +147,16 @@ method scale(Num(Cool) $x) {
   fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
   self
 }
+method sum(--> Num) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in sum: version < v2.7" if $gsl-version < 2.7;
+  gsl_vector_float_sum($!vector)
+}
+method axpby(Num(Cool) $alpha, Num(Cool) $beta, Math::Libgsl::Vector::Num32 $b where $!vector.size == .vector.size) {
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in axpby: version < v2.7" if $gsl-version < 2.7;
+  my $ret = gsl_vector_float_axpby($alpha, $!vector, $beta, $b.vector);
+  fail X::Libgsl.new: errno => $ret, error => "Can't do axpby" if $ret ≠ GSL_SUCCESS;
+  self
+}
 method add-constant(Num(Cool) $x) {
   my $ret = gsl_vector_float_add_constant($!vector, $x);
   fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to the elements" if $ret ≠ GSL_SUCCESS;
