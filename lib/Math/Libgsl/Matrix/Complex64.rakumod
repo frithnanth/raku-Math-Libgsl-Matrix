@@ -160,7 +160,7 @@ method swap(Math::Libgsl::Matrix::Complex64 $src where $!matrix.size1 == .matrix
 }
 method tricpy(Math::Libgsl::Matrix::Complex64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
   my $ret;
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     $ret = gsl_matrix_complex_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
     $ret = gsl_matrix_complex_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
@@ -242,7 +242,7 @@ method transpose() {
 method transpose-tricpy(Math::Libgsl::Matrix::Complex64 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
   fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
   my $ret;
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     $ret = gsl_matrix_complex_transpose_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
     $ret = gsl_matrix_complex_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);

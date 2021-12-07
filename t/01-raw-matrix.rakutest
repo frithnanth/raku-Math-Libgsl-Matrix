@@ -131,7 +131,7 @@ subtest {
   is-deeply (gather take gsl_vector_get($v1, $_) for ^10), (8e0 xx 10).flat, 'vector scale';
   ok gsl_vector_add_constant($v1, 1e0) == GSL_SUCCESS, 'can add a constant';
   is-deeply (gather take gsl_vector_get($v1, $_) for ^10), (9e0 xx 10).flat, 'vector add_constant';
-  if $gsl-version > 2.6 {
+  if $gsl-version > v2.6 {
     ok gsl_vector_sum($v1) == 90e0, 'vector sum all elements';
     ok gsl_vector_axpby(2e0, $v1, 3e0, $v2) == GSL_SUCCESS, 'can compute αx + βy';
     is-deeply (gather take gsl_vector_get($v2, $_) for ^10), (24e0 xx 10).flat, 'vector axpby';
@@ -285,7 +285,7 @@ subtest {
   is-deeply ( gather for ^4 -> $i { for ^4 -> $j { take gsl_matrix_get($m1, $i, $j) } } ), $mm.flat, 'set column';
   gsl_matrix_set_all($m1, 1e0);
   gsl_matrix_set_zero($m2);
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     gsl_matrix_tricpy(CblasUpper, CblasUnit, $m2, $m1);
   } else {
     gsl_matrix_tricpy('U'.ord, 0, $m2, $m1);
@@ -317,7 +317,7 @@ subtest {
   my gsl_matrix $m2 = gsl_matrix_alloc(4, 4);
   gsl_matrix_set_zero($m2);
   gsl_matrix_set_all($m, 1e0);
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     gsl_matrix_transpose_tricpy(CblasUpper, CblasUnit, $m2, $m);
   } else {
     gsl_matrix_transpose_tricpy('U'.ord, 0, $m2, $m);
@@ -346,7 +346,7 @@ subtest {
   is-deeply ( gather for ^4 -> $i { take gsl_matrix_get($m1, $i, 0) } ), (2e0, 2e0, 2e0, 2e0), 'matrix scale';
   ok gsl_matrix_add_constant($m1, 2e0) == GSL_SUCCESS, 'can matrix add constant';
   is-deeply ( gather for ^4 -> $i { take gsl_matrix_get($m1, $i, 0) } ), (4e0, 4e0, 4e0, 4e0), 'matrix add constant';
-  if $gsl-version > 2.6 {
+  if $gsl-version > v2.6 {
     my gsl_vector $v = gsl_vector_alloc(4);
     gsl_vector_set($v, 0, 0e0);
     gsl_vector_set($v, 1, 1e0);
@@ -391,7 +391,7 @@ subtest {
   my gsl_matrix $m2 = gsl_matrix_alloc(4, 4);
   gsl_matrix_set_zero($m2);
   ok gsl_matrix_equal($m1, $m2) == 1, 'matrix equal';
-  if $gsl-version > 2.6 {
+  if $gsl-version > v2.6 {
     gsl_matrix_set_all($m1, 2e0);
     ok gsl_matrix_norm1($m1) == 8e0, 'matrix 1-norm';
   }
@@ -399,7 +399,7 @@ subtest {
   gsl_matrix_free($m2);
 }, 'matrix properties';
 
-if $gsl-version > 2.6 {
+if $gsl-version > v2.6 {
   subtest {
     my gsl_matrix_complex $src = gsl_matrix_complex_calloc(2, 3);
     my gsl_matrix_complex $dst = gsl_matrix_complex_calloc(3, 2);

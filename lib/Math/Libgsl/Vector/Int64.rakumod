@@ -153,11 +153,11 @@ method add-constant(Int(Cool) $x) {
   self
 }
 method sum(--> Int) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in sum: version < v2.7" if $gsl-version < 2.7;
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in sum: version < v2.7" if $gsl-version < v2.7;
   gsl_vector_long_sum($!vector)
 }
 method axpby(Int(Cool) $alpha, Int(Cool) $beta, Math::Libgsl::Vector::Int64 $b where $!vector.size == .vector.size) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in axpby: version < v2.7" if $gsl-version < 2.7;
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in axpby: version < v2.7" if $gsl-version < v2.7;
   my $ret = gsl_vector_long_axpby($alpha, $!vector, $beta, $b.vector);
   fail X::Libgsl.new: errno => $ret, error => "Can't do axpby" if $ret ≠ GSL_SUCCESS;
   self

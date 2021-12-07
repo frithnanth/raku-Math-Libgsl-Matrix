@@ -189,7 +189,7 @@ subtest {
   is-deeply ($m1.get-row($_) for ^3).flat, ((2e0, 2e0, 4e0) xx 3).flat, 'can scale';
   $m1.add-constant(1);
   is-deeply ($m1.get-row($_) for ^3).flat, ((3e0, 3e0, 5e0) xx 3).flat, 'can add a constant';
-  if $gsl-version > 2.6 {
+  if $gsl-version > v2.6 {
     my Math::Libgsl::Vector $v1 .= new(:size(3));
     $v1.set($_, $_.Num) for ^3;
     $m1.scale-rows($v1);
@@ -225,7 +225,7 @@ subtest {
   my Math::Libgsl::Matrix $m2 .= new(:size1(3), :size2(3));
   $m2.setall(-2e0);
   ok $m1.is-equal($m2), 'two matrices are equal';
-  if $gsl-version > 2.6 {
+  if $gsl-version > v2.6 {
     $m1.setall(2);
     ok $m1.norm1 == 6, 'matrix 1-norm';
   }

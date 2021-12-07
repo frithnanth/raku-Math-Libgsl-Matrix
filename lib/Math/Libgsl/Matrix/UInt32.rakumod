@@ -138,7 +138,7 @@ method swap(Math::Libgsl::Matrix::UInt32 $src where $!matrix.size1 == .matrix.si
 }
 method tricpy(Math::Libgsl::Matrix::UInt32 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
   my $ret;
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     $ret = gsl_matrix_uint_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
     $ret = gsl_matrix_uint_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
@@ -218,7 +218,7 @@ method transpose() {
 method transpose-tricpy(Math::Libgsl::Matrix::UInt32 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
   fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
   my $ret;
-  if $gsl-version > 2.5 {
+  if $gsl-version > v2.5 {
     $ret = gsl_matrix_uint_transpose_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
     $ret = gsl_matrix_uint_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
@@ -253,13 +253,13 @@ method scale(Num(Cool) $x) {
   self
 }
 method scale-rows(Math::Libgsl::Vector::UInt32 $x where .size == $!matrix.size1) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7" if $gsl-version < 2.7;
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7" if $gsl-version < v2.7;
   my $ret = gsl_matrix_uint_scale_rows($!matrix, $x.vector);
   fail X::Libgsl.new: errno => $ret, error => "Can't scale-rows" if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale-columns(Math::Libgsl::Vector::UInt32 $x where .size == $!matrix.size2) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7" if $gsl-version < 2.7;
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7" if $gsl-version < v2.7;
   my $ret = gsl_matrix_uint_scale_columns($!matrix, $x.vector);
   fail X::Libgsl.new: errno => $ret, error => "Can't scale-columns" if $ret ≠ GSL_SUCCESS;
   self
@@ -299,6 +299,6 @@ method is-neg(--> Bool)    { gsl_matrix_uint_isneg($!matrix)    ?? True !! False
 method is-nonneg(--> Bool) { gsl_matrix_uint_isnonneg($!matrix) ?? True !! False }
 method is-equal(Math::Libgsl::Matrix::UInt32 $b --> Bool) { gsl_matrix_uint_equal($!matrix, $b.matrix) ?? True !! False }
 method norm1(--> UInt) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in norm1: version < v2.7" if $gsl-version < 2.7;
+  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in norm1: version < v2.7" if $gsl-version < v2.7;
   gsl_matrix_uint_norm1($!matrix)
 }
