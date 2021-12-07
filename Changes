@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+
+0.4.2  2021-12-07T20:01:57+01:00
     - Check library version using new $gsl-version object
     - Use zef ecosystem
 

@@ -1,6 +1,6 @@
 use v6;
 
-unit module Math::Libgsl::Raw::Matrix::Int64:ver<0.4.1>:auth<zef:frithnanth>;
+unit module Math::Libgsl::Raw::Matrix::Int64:ver<0.4.2>:auth<zef:frithnanth>;
 
 use NativeCall;
 
