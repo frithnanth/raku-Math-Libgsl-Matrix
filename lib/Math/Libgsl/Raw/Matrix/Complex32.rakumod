@@ -1,6 +1,6 @@
 use v6;
 
-unit module Math::Libgsl::Raw::Matrix::Complex32:ver<0.4.2>:auth<zef:FRITH>;
+unit module Math::Libgsl::Raw::Matrix::Complex32:ver<0.4.3>:auth<zef:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Num32;
