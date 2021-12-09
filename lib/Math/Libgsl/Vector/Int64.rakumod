@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Vector::Int64:ver<0.4.2>:auth<zef:frithnanth>;
+unit class Math::Libgsl::Vector::Int64:ver<0.4.2>:auth<zef:FRITH>;
 
 use Math::Libgsl::Raw::Matrix::Int64 :ALL;
 use Math::Libgsl::Exception;

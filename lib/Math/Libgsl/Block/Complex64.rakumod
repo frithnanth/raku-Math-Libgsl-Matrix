@@ -1,6 +1,6 @@
 use v6;
 
-unit class Math::Libgsl::Block::Complex64:ver<0.4.2>:auth<zef:frithnanth>;
+unit class Math::Libgsl::Block::Complex64:ver<0.4.2>:auth<zef:FRITH>;
 
 use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Complex64 :ALL;
