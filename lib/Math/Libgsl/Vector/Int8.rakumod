@@ -58,29 +58,29 @@ method setall(Int(Cool) $x!) { gsl_vector_char_set_all($!vector, $x); self }
 method zero() { gsl_vector_char_set_zero($!vector); self }
 method basis(Int:D $index! where * < $!vector.size) {
   my $ret = gsl_vector_char_set_basis($!vector, $index);
-  fail X::Libgsl.new: errno => $ret, error => "Can't make a basis vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't make a basis vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method size(--> UInt){ self.vector.size }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_vector_char_fwrite($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't write the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't write the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method read(Str $filename!) {
   my $ret = mgsl_vector_char_fread($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't read the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't read the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method printf(Str $filename!, Str $format!) {
   my $ret = mgsl_vector_char_fprintf($filename, $!vector, $format);
-  fail X::Libgsl.new: errno => $ret, error => "Can't print the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't print the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scanf(Str $filename!) {
   my $ret = mgsl_vector_char_fscanf($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scan the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scan the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # View
@@ -102,54 +102,54 @@ sub int8-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
 # Copy
 method copy(Math::Libgsl::Vector::Int8 $src where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_memcpy($!vector, $src.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't copy the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't copy the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method swap(Math::Libgsl::Vector::Int8 $w where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_swap($!vector, $w.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Exchanging elements
 method swap-elems(Int $i where * < $!vector.size, Int $j where * < $!vector.size) {
   my $ret = gsl_vector_char_swap_elements($!vector, $i, $j);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap elements" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap elements").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method reverse() {
   my $ret = gsl_vector_char_reverse($!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't reverse the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't reverse the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Vector operations
 method add(Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_add($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method sub(Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_sub($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't sub two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't sub two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method mul(Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_mul($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't mul two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't mul two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method div(Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_char_div($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't div two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't div two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale(Int(Cool) $x) {
   my $ret = gsl_vector_char_scale($!vector, $x);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scale the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method add-constant(Int(Cool) $x) {
   my $ret = gsl_vector_char_add_constant($!vector, $x);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to the elements" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add a constant to the elements").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method sum(--> Int) {
@@ -157,9 +157,9 @@ method sum(--> Int) {
   gsl_vector_char_sum($!vector)
 }
 method axpby(Int(Cool) $alpha, Int(Cool) $beta, Math::Libgsl::Vector::Int8 $b where $!vector.size == .vector.size) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in axpby: version < v2.7" if $gsl-version < v2.7;
+  X::Libgsl.new(errno => GSL_FAILURE, error => "Error in axpby: version < v2.7").throw if $gsl-version < v2.7;
   my $ret = gsl_vector_char_axpby($alpha, $!vector, $beta, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't do axpby" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't do axpby").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Finding maximum and minimum elements of vectors

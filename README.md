@@ -339,6 +339,8 @@ Matrix
 
 The constructor accepts two parameters: the matrix sizes; they can be passed as Pairs or as single values.
 
+All the following methods *throw* on error if they return **self**, otherwise they *fail* on error.
+
 ### get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num)
 
 This method returns the value of a matrix element. It is possible to address a matrix element as a Raku shaped array element:

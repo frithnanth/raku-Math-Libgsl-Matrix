@@ -91,29 +91,29 @@ method setall(Complex $x!) {
 method zero() { gsl_vector_complex_set_zero($!vector); self }
 method basis(Int:D $index! where * < $!vector.size) {
   my $ret = gsl_vector_complex_set_basis($!vector, $index);
-  fail X::Libgsl.new: errno => $ret, error => "Can't make a basis vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't make a basis vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method size(--> UInt){ self.vector.size }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_vector_complex_fwrite($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't write the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't write the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method read(Str $filename!) {
   my $ret = mgsl_vector_complex_fread($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't read the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't read the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method printf(Str $filename!, Str $format!) {
   my $ret = mgsl_vector_complex_fprintf($filename, $!vector, $format);
-  fail X::Libgsl.new: errno => $ret, error => "Can't print the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't print the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scanf(Str $filename!) {
   my $ret = mgsl_vector_complex_fscanf($filename, $!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scan the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scan the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # View
@@ -135,44 +135,44 @@ sub complex64-array-stride-vec(Block $bl, size_t $stride, *@data) is export {
 # Copy
 method copy(Math::Libgsl::Vector::Complex64 $src where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_memcpy($!vector, $src.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't copy the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't copy the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method swap(Math::Libgsl::Vector::Complex64 $w where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_swap($!vector, $w.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Exchanging elements
 method swap-elems(Int $i where * < $!vector.size, Int $j where * < $!vector.size) {
   my $ret = gsl_vector_complex_swap_elements($!vector, $i, $j);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap elements" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap elements").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method reverse() {
   my $ret = gsl_vector_complex_reverse($!vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't reverse the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't reverse the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Vector operations
 method add(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_add($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method sub(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_sub($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't sub two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't sub two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method mul(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_mul($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't mul two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't mul two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method div(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.size) {
   my $ret = gsl_vector_complex_div($!vector, $b.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't div two vectors" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't div two vectors").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale(Complex() $x) {
@@ -180,7 +180,7 @@ method scale(Complex() $x) {
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_scale($!vector, $c);
   free_gsl_complex($c);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scale the vector" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scale the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method add-constant(Complex() $x) {
@@ -188,7 +188,7 @@ method add-constant(Complex() $x) {
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_add_constant($!vector, $c);
   free_gsl_complex($c);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add a constant to all elements" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add a constant to all elements").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Vector properties

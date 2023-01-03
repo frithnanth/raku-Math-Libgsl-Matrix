@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Methods that return self throw on error, instead of failing
 
 0.4.3  2021-12-09T11:33:56+01:00
     - Change :auth field

@@ -67,22 +67,22 @@ method identity() { gsl_matrix_long_set_identity($!matrix); self }
 # IO
 method write(Str $filename!) {
   my $ret = mgsl_matrix_long_fwrite($filename, $!matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't write the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't write the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method read(Str $filename!) {
   my $ret = mgsl_matrix_long_fread($filename, $!matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't read the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't read the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method printf(Str $filename!, Str $format!) {
   my $ret = mgsl_matrix_long_fprintf($filename, $!matrix, $format);
-  fail X::Libgsl.new: errno => $ret, error => "Can't print the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't print the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scanf(Str $filename!) {
   my $ret = mgsl_matrix_long_fscanf($filename, $!matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scan the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scan the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # View
@@ -125,12 +125,12 @@ sub int64-array-tda-mat(Block $bl, UInt $size1, UInt $size2, size_t $tda where *
 # Copying matrices
 method copy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_memcpy($!matrix, $src.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't copy the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't copy the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method swap(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_swap($!matrix, $src.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap the matrices" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap the matrices").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method tricpy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2, Int $Uplo, Int $Diag) {
@@ -140,7 +140,7 @@ method tricpy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.s
   } else {
     $ret = gsl_matrix_long_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
   }
-  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy the matrix" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't triangular-copy the matrix").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Rows and columns
@@ -163,12 +163,12 @@ multi method set-row(Int:D $i where * ≤ $!matrix.size1, @row where *.elems == 
   LEAVE { gsl_vector_long_free($v) }
   gsl_vector_long_set($v, $_, @row[$_].Num) for ^$!matrix.size2;
   my $ret = gsl_matrix_long_set_row($!matrix, $i, $v);
-  fail X::Libgsl.new: errno => $ret, error => "Can't set row" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't set row").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 multi method set-row(Int:D $i where * ≤ $!matrix.size1, Math::Libgsl::Vector::Int64 $v where .vector.size == $!matrix.size2) {
   my $ret = gsl_matrix_long_set_row($!matrix, $i, $v.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't set row" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't set row").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 multi method set-col(Int:D $j where * ≤ $!matrix.size2, @col where *.elems == $!matrix.size1) {
@@ -176,94 +176,94 @@ multi method set-col(Int:D $j where * ≤ $!matrix.size2, @col where *.elems == 
   LEAVE { gsl_vector_long_free($v) }
   gsl_vector_long_set($v, $_, @col[$_].Num) for ^$!matrix.size1;
   my $ret = gsl_matrix_long_set_col($!matrix, $j, $v);
-  fail X::Libgsl.new: errno => $ret, error => "Can't set col" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't set col").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 multi method set-col(Int:D $j where * ≤ $!matrix.size2, Math::Libgsl::Vector::Int64 $v where .vector.size == $!matrix.size1) {
   my $ret = gsl_matrix_long_set_col($!matrix, $j, $v.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't set col" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't set col").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Exchanging rows and columns
 method swap-rows(Int:D $i where * ≤ $!matrix.size1, Int:D $j where * ≤ $!matrix.size1) {
   my $ret = gsl_matrix_long_swap_rows($!matrix, $i, $j);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap rows" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap rows").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method swap-cols(Int:D $i where * ≤ $!matrix.size2, Int:D $j where * ≤ $!matrix.size2) {
   my $ret = gsl_matrix_long_swap_columns($!matrix, $i, $j);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap columns" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap columns").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method swap-rowcol(Int:D $i where * ≤ $!matrix.size1, Int:D $j where * ≤ $!matrix.size1) {
-  fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
+  X::Libgsl.new(errno => GSL_ENOTSQR, error => "Not a square matrix").throw if $!matrix.size1 ≠ $!matrix.size2;
   my $ret = gsl_matrix_long_swap_rowcol($!matrix, $i, $j);
-  fail X::Libgsl.new: errno => $ret, error => "Can't swap row & column" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't swap row & column").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method copy-transpose(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1) {
   my $ret = gsl_matrix_long_transpose_memcpy($!matrix, $src.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't copy and transpose" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't copy and transpose").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method transpose() {
-  fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
+  X::Libgsl.new(errno => GSL_ENOTSQR, error => "Not a square matrix").throw if $!matrix.size1 ≠ $!matrix.size2;
   my $ret = gsl_matrix_long_transpose($!matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't transpose" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't transpose").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method transpose-tricpy(Math::Libgsl::Matrix::Int64 $src where $!matrix.size1 == .matrix.size2 && $!matrix.size2 == .matrix.size1, Int $Uplo, Int $Diag) {
-  fail X::Libgsl.new: errno => GSL_ENOTSQR, error => "Not a square matrix" if $!matrix.size1 ≠ $!matrix.size2;
+  X::Libgsl.new(errno => GSL_ENOTSQR, error => "Not a square matrix").throw if $!matrix.size1 ≠ $!matrix.size2;
   my $ret;
   if $gsl-version > v2.5 {
     $ret = gsl_matrix_long_transpose_tricpy($Uplo, $Diag, $!matrix, $src.matrix);
   } else {
     $ret = gsl_matrix_long_transpose_tricpy($Uplo == CblasUpper ?? 'U'.ord !! 'L'.ord, $Diag == CblasUnit ?? 0 !! 1, $!matrix, $src.matrix);
   }
-  fail X::Libgsl.new: errno => $ret, error => "Can't triangular-copy transpose" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't triangular-copy transpose").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Matrix operations
 method add(Math::Libgsl::Matrix::Int64 $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_add($!matrix, $b.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method sub(Math::Libgsl::Matrix::Int64 $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_sub($!matrix, $b.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't sub" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't sub").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method mul(Math::Libgsl::Matrix::Int64 $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_mul_elements($!matrix, $b.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't mul" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't mul").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method div(Math::Libgsl::Matrix::Int64 $b where $!matrix.size1 == .matrix.size1 && $!matrix.size2 == .matrix.size2) {
   my $ret = gsl_matrix_long_div_elements($!matrix, $b.matrix);
-  fail X::Libgsl.new: errno => $ret, error => "Can't div" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't div").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale(Num(Cool) $x) {
   my $ret = gsl_matrix_long_scale($!matrix, $x);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scale" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scale").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale-rows(Math::Libgsl::Vector::Int64 $x where .size == $!matrix.size1) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7" if $gsl-version < v2.7;
+  X::Libgsl.new(errno => GSL_FAILURE, error => "Error in scale-rows: version < v2.7").throw if $gsl-version < v2.7;
   my $ret = gsl_matrix_long_scale_rows($!matrix, $x.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scale-rows" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scale-rows").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method scale-columns(Math::Libgsl::Vector::Int64 $x where .size == $!matrix.size2) {
-  fail X::Libgsl.new: errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7" if $gsl-version < v2.7;
+  X::Libgsl.new(errno => GSL_FAILURE, error => "Error in scale-columns: version < v2.7").throw if $gsl-version < v2.7;
   my $ret = gsl_matrix_long_scale_columns($!matrix, $x.vector);
-  fail X::Libgsl.new: errno => $ret, error => "Can't scale-columns" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't scale-columns").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method add-constant(Num(Cool) $x) {
   my $ret = gsl_matrix_long_add_constant($!matrix, $x);
-  fail X::Libgsl.new: errno => $ret, error => "Can't add constant" if $ret ≠ GSL_SUCCESS;
+  X::Libgsl.new(errno => $ret, error => "Can't add constant").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 # Finding maximum and minimum elements of matrices
