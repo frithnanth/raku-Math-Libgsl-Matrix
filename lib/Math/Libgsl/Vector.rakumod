@@ -58,9 +58,7 @@ multi method gist(Math::Libgsl::Vector: --> Str) {
   }
   '(' ~ (^$size).map({ gsl_vector_get($!vector, $_) }).Str ~ "$ellip)";
 }
-multi method Str(Math::Libgsl::Vector: --> Str) {
-  (^$!vector.size).map({ gsl_vector_get($!vector, $_) })».Str.join(' ')
-}
+multi method Str(Math::Libgsl::Vector: --> Str) { self.list.join(' ') }
 
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Num) { gsl_vector_get($!vector, $index) }

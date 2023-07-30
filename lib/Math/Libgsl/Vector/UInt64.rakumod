@@ -58,9 +58,7 @@ multi method gist(Math::Libgsl::Vector::UInt64: --> Str) {
   }
   '(' ~ (^$size).map({ gsl_vector_ulong_get($!vector, $_) }).Str ~ "$ellip)";
 }
-multi method Str(Math::Libgsl::Vector::UInt64: --> Str) {
-  (^$!vector.size).map({ gsl_vector_ulong_get($!vector, $_) })».Str.join(' ')
-}
+multi method Str(Math::Libgsl::Vector::UInt64: --> Str) { self.join.join(' ') }
 
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_ulong_get($!vector, $index) }

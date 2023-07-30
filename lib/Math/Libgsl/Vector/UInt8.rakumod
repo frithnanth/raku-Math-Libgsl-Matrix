@@ -58,9 +58,7 @@ multi method gist(Math::Libgsl::Vector::UInt8: --> Str) {
   }
   '(' ~ (^$size).map({ gsl_vector_uchar_get($!vector, $_) }).Str ~ "$ellip)";
 }
-multi method Str(Math::Libgsl::Vector::UInt8: --> Str) {
-  (^$!vector.size).map({ gsl_vector_uchar_get($!vector, $_) })».Str.join(' ')
-}
+multi method Str(Math::Libgsl::Vector::UInt8: --> Str) { self.list.join(' ') }
 
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_uchar_get($!vector, $index) }

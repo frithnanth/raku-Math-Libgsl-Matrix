@@ -66,9 +66,7 @@ multi method gist(Math::Libgsl::Vector::Complex32: --> Str) {
   }
   '(' ~ (^$size).map({ mgsl_vector_complex_float_get($!vector, $_) }).Str ~ "$ellip)";
 }
-multi method Str(Math::Libgsl::Vector::Complex32: --> Str) {
-  (^$!vector.size).map({ mgsl_vector_complex_float_get($!vector, $_) })».Str.join(' ')
-}
+multi method Str(Math::Libgsl::Vector::Complex32: --> Str) { self.list.join(' ') }
 
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Complex) {
