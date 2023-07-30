@@ -81,6 +81,18 @@ Vector
 
 The constructor accepts one parameter: the vector's size; it can be passed as a Pair or as a single value.
 
+### list(--> List)
+
+This method returns all the elements of the Vector as a Raku List.
+
+### gist(--> Str)
+
+This method returns the first 100 elements of the Vector interpolated in a Raku Str. The .gist method is used by the Raku say() function and method to print a representation of an object.
+
+### Str(--> Str)
+
+This method returns all the elements of the Vector interpolated in a Raku Str. The .Str method is used by the Raku put() function and method to print an object.
+
 ### get(Int:D $index! where * < $!vector.size --> Num)
 
 This method returns the value of a vector's element. It is possible to address a vector element as a Raku array element:
@@ -340,6 +352,18 @@ Matrix
 The constructor accepts two parameters: the matrix sizes; they can be passed as Pairs or as single values.
 
 All the following methods *throw* on error if they return **self**, otherwise they *fail* on error.
+
+### list(--> List)
+
+This method returns all the elements of the Matrix as a Raku List of Lists.
+
+### gist(--> Str)
+
+This method returns the first 10 elements of the first 10 rows of the Matrix interpolated in a Raku Str. The .gist method is used by the Raku say() function and method to print a representation of an object.
+
+### Str(--> Str)
+
+This method returns all the elements of the Matrix interpolated in a Raku Str. The .Str method is used by the Raku put() function and method to print an object.
 
 ### get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num)
 

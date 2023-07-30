@@ -396,6 +396,20 @@ All the following methods are available for the classes correspondig to each dat
 
 The constructor accepts one parameter: the vector's size; it can be passed as a Pair or as a single value.
 
+=head3 list(--> List)
+
+This method returns all the elements of the Vector as a Raku List.
+
+=head3 gist(--> Str)
+
+This method returns the first 100 elements of the Vector interpolated in a Raku Str.
+The .gist method is used by the Raku say() function and method to print a representation of an object.
+
+=head3 Str(--> Str)
+
+This method returns all the elements of the Vector interpolated in a Raku Str.
+The .Str method is used by the Raku put() function and method to print an object.
+
 =head3 get(Int:D $index! where * < $!vector.size --> Num)
 
 This method returns the value of a vector's element.
@@ -693,6 +707,20 @@ The num64, being the default data type, has a special B<array-stride-vec> alias.
 The constructor accepts two parameters: the matrix sizes; they can be passed as Pairs or as single values.
 
 All the following methods I<throw> on error if they return B<self>, otherwise they I<fail> on error.
+
+=head3 list(--> List)
+
+This method returns all the elements of the Matrix as a Raku List of Lists.
+
+=head3 gist(--> Str)
+
+This method returns the first 10 elements of the first 10 rows of the Matrix interpolated in a Raku Str.
+The .gist method is used by the Raku say() function and method to print a representation of an object.
+
+=head3 Str(--> Str)
+
+This method returns all the elements of the Matrix interpolated in a Raku Str.
+The .Str method is used by the Raku put() function and method to print an object.
 
 =head3 get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num)
 

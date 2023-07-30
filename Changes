@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Add .list .gist .Str to Vector and Matrix classes
 
 0.5.0  2023-01-03T10:59:34Z
     - Methods that return self throw on error, instead of failing
