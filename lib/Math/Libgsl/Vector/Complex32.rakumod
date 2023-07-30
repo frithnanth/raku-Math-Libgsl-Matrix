@@ -53,6 +53,23 @@ class View {
 submethod DESTROY {
   gsl_vector_complex_float_free($!vector) unless $!view;
 }
+
+multi method list(Math::Libgsl::Vector::Complex32: --> List) { (^$!vector.size).map({ mgsl_vector_complex_float_get($!vector, $_) }).List }
+multi method gist(Math::Libgsl::Vector::Complex32: --> Str) {
+  my ($size, $ellip);
+  if $!vector.size > 100 {
+    $size = 100;
+    $ellip = ' ...';
+  } else {
+    $size = $!vector.size;
+    $ellip = '';
+  }
+  '(' ~ (^$size).map({ mgsl_vector_complex_float_get($!vector, $_) }).Str ~ "$ellip)";
+}
+multi method Str(Math::Libgsl::Vector::Complex32: --> Str) {
+  (^$!vector.size).map({ mgsl_vector_complex_float_get($!vector, $_) })».Str.join(' ')
+}
+
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Complex) {
   my gsl_complex_float $c = alloc_gsl_complex_float;

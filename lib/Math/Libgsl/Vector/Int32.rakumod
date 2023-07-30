@@ -45,6 +45,23 @@ submethod BUILD(Int :$size?, gsl_vector_int :$vector?) {
 submethod DESTROY {
   gsl_vector_int_free($!vector) unless $!view;
 }
+
+multi method list(Math::Libgsl::Vector::Int32: --> List) { (^$!vector.size).map({ gsl_vector_int_get($!vector, $_) }).List }
+multi method gist(Math::Libgsl::Vector::Int32: --> Str) {
+  my ($size, $ellip);
+  if $!vector.size > 100 {
+    $size = 100;
+    $ellip = ' ...';
+  } else {
+    $size = $!vector.size;
+    $ellip = '';
+  }
+  '(' ~ (^$size).map({ gsl_vector_int_get($!vector, $_) }).Str ~ "$ellip)";
+}
+multi method Str(Math::Libgsl::Vector::Int32: --> Str) {
+  (^$!vector.size).map({ gsl_vector_int_get($!vector, $_) })».Str.join(' ')
+}
+
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Int) { gsl_vector_int_get($!vector, $index) }
 method AT-POS(Math::Libgsl::Vector::Int32:D: Int:D $index! where * < $!vector.size --> Int) {

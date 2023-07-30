@@ -53,6 +53,23 @@ submethod BUILD(Int :$size?, gsl_vector_complex :$vector?) {
 submethod DESTROY {
   gsl_vector_complex_free($!vector) unless $!view;
 }
+
+multi method list(Math::Libgsl::Vector::Complex64: --> List) { (^$!vector.size).map({ mgsl_vector_complex_get($!vector, $_) }).List }
+multi method gist(Math::Libgsl::Vector::Complex64: --> Str) {
+  my ($size, $ellip);
+  if $!vector.size > 100 {
+    $size = 100;
+    $ellip = ' ...';
+  } else {
+    $size = $!vector.size;
+    $ellip = '';
+  }
+  '(' ~ (^$size).map({ mgsl_vector_complex_get($!vector, $_) }).Str ~ "$ellip)";
+}
+multi method Str(Math::Libgsl::Vector::Complex64: --> Str) {
+  (^$!vector.size).map({ mgsl_vector_complex_get($!vector, $_) })».Str.join(' ')
+}
+
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Complex) {
   my gsl_complex $c = alloc_gsl_complex;
