@@ -54,53 +54,50 @@ submethod DESTROY {
   gsl_vector_complex_free($!vector) unless $!view;
 }
 
-multi method list(Math::Libgsl::Vector::Complex64: --> List) { (^$!vector.size).map({ mgsl_vector_complex_get($!vector, $_) }).List }
+multi method list(Math::Libgsl::Vector::Complex64: --> List) {
+  my gsl_complex $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
+  (^$!vector.size).map({ mgsl_vector_complex_get($!vector, $_, $c); $c.dat[0] + i * $c.dat[1] }).List
+}
 multi method gist(Math::Libgsl::Vector::Complex64: --> Str) {
-  my ($size, $ellip);
-  if $!vector.size > 100 {
-    $size = 100;
-    $ellip = ' ...';
-  } else {
-    $size = $!vector.size;
-    $ellip = '';
-  }
-  '(' ~ (^$size).map({ mgsl_vector_complex_get($!vector, $_) }).Str ~ "$ellip)";
+  my gsl_complex $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
+  my ($size, $ellip) = $!vector.size > 100 ?? (100, ' ...') !! ($!vector.size, '');
+  '(' ~ (^$size).map({ mgsl_vector_complex_get($!vector, $_, $c); $c.dat[0] + i * $c.dat[1] }).Str ~ "$ellip)";
 }
 multi method Str(Math::Libgsl::Vector::Complex64: --> Str) { self.list.join(' ') }
 
 # Accessors
 method get(Int:D $index! where * < $!vector.size --> Complex) {
   my gsl_complex $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_vector_complex_get($!vector, $index, $c);
-  my Complex $nc = $c.dat[0] + i * $c.dat[1];
-  free_gsl_complex($c);
-  $nc;
+  $c.dat[0] + i * $c.dat[1];
 }
 method AT-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size --> Complex) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_vector_complex_get($!vector, $index, $c);
-  my Complex $nc = $c.dat[0] + i * $c.dat[1];
-  free_gsl_complex($c);
-  $nc;
+  $c.dat[0] + i * $c.dat[1];
 }
 method set(Int:D $index! where * < $!vector.size, Complex $x!) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_set($!vector, $index, $c);
-  free_gsl_complex($c);
   self
 }
 method ASSIGN-POS(Math::Libgsl::Vector::Complex64:D: Int:D $index! where * < $!vector.size, Complex(Cool) $x!) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_set($!vector, $index, $c);
-  free_gsl_complex($c);
 }
 method setall(Complex $x!) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_complex_rect($x.re, $x.im, $c);
   mgsl_vector_complex_set_all($!vector, $c);
-  free_gsl_complex($c);
   self
 }
 method zero() { gsl_vector_complex_set_zero($!vector); self }
@@ -192,17 +189,17 @@ method div(Math::Libgsl::Vector::Complex64 $b where $!vector.size == .vector.siz
 }
 method scale(Complex() $x) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_scale($!vector, $c);
-  free_gsl_complex($c);
   X::Libgsl.new(errno => $ret, error => "Can't scale the vector").throw if $ret ≠ GSL_SUCCESS;
   self
 }
 method add-constant(Complex() $x) {
   my $c = alloc_gsl_complex;
+  LEAVE { free_gsl_complex($c) };
   mgsl_complex_rect($x.re, $x.im, $c);
   my $ret = mgsl_vector_complex_add_constant($!vector, $c);
-  free_gsl_complex($c);
   X::Libgsl.new(errno => $ret, error => "Can't add a constant to all elements").throw if $ret ≠ GSL_SUCCESS;
   self
 }

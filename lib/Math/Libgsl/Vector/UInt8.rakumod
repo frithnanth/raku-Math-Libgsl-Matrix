@@ -48,14 +48,7 @@ submethod DESTROY {
 
 multi method list(Math::Libgsl::Vector::UInt8: --> List) { (^$!vector.size).map({ gsl_vector_uchar_get($!vector, $_) }).List }
 multi method gist(Math::Libgsl::Vector::UInt8: --> Str) {
-  my ($size, $ellip);
-  if $!vector.size > 100 {
-    $size = 100;
-    $ellip = ' ...';
-  } else {
-    $size = $!vector.size;
-    $ellip = '';
-  }
+  my ($size, $ellip) = $!vector.size > 100 ?? (100, ' ...') !! ($!vector.size, '');
   '(' ~ (^$size).map({ gsl_vector_uchar_get($!vector, $_) }).Str ~ "$ellip)";
 }
 multi method Str(Math::Libgsl::Vector::UInt8: --> Str) { self.list.join(' ') }
