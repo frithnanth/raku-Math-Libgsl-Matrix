@@ -6,7 +6,7 @@ use Math::Libgsl::Matrix;
 use Math::Libgsl::Vector;
 use Math::Libgsl::Constants;
 
-subtest {
+subtest 'matrix allocation' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   isa-ok $m1, Math::Libgsl::Matrix, 'new using pairs';
   ok $m1.matrix.size1 == 3 && $m1.matrix.size2 == 3, 'size directly';
@@ -15,9 +15,9 @@ subtest {
   ok $m1.size2 == 3, 'size2';
   my Math::Libgsl::Matrix $m2 .= new(3, 3);
   isa-ok $m2, Math::Libgsl::Matrix, 'new using values';
-}, 'matrix allocation';
+};
 
-subtest {
+subtest 'matrix set & get' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   ok $m1.get(0, 0) == 0, 'get element';
   dies-ok { $m1.get(3, 3) }, 'get element (4,4) of a (3,3) matrix dies';
@@ -35,9 +35,9 @@ subtest {
   is-deeply ($m1.get-row($_) for ^3).flat, (0e0 xx 9), 'all elements zeroed';
   lives-ok { $m1.identity }, 'identity';
   is-deeply ($m1.get-row($_) for ^3).flat, (1e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 1e0), 'identity matrix';
-}, 'matrix set & get';
+};
 
-subtest {
+subtest 'matrix IO' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   $m1.setall(1);
   my $filename = 't/matrix.dat';
@@ -46,9 +46,9 @@ subtest {
   lives-ok { $m1.read($filename) }, 'can read a matrix from file';
   lives-ok { $m1.printf($filename, "%3.1lf") }, 'can print a matrix to file';
   is-deeply $filename.IO.lines, '1.0' xx 9, 'matrix file';
-}, 'matrix IO';
+};
 
-subtest {
+subtest 'views' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));
   $m1.setall(1);
   my Math::Libgsl::Matrix::View $mv1 .= new;
@@ -107,9 +107,9 @@ subtest {
   is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0, 3e0, 5e0, 6e0, 0e0).flat, 'matrix view of an array with tda';
   array-tda-mat(-> $mat { $matrix.copy($mat); $matrix[0;0] = 0 }, 2, 3, 4, $list);
   is-deeply ($matrix.get-row($_) for ^2).flat, (0e0, 2e0, 3e0, 5e0, 6e0, 0e0).flat, 'matrix view of a list with tda';
-}, 'views';
+};
 
-subtest {
+subtest 'copy & swap' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   $m1.setall(1);
   my Math::Libgsl::Matrix $m2 .= new(:size1(3), :size2(3));
@@ -123,9 +123,9 @@ subtest {
   my Math::Libgsl::Matrix $m4 .= new(:size1(4), :size2(4));
   lives-ok { $m4.tricpy($m3, CblasUpper, CblasUnit) }, 'can tricpy';
   is-deeply ($m4.get-row($_) for ^4).flat, (0e0, 1e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 0e0), 'tricpy matrix';
-}, 'copy & swap';
+};
 
-subtest {
+subtest 'get & set rows & columns' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));
   my Math::Libgsl::Vector $v1 .= new(:size(4));
   $v1.set($_, $_.Num) for ^4;
@@ -141,9 +141,9 @@ subtest {
   my @col = ^3;
   lives-ok { $m1.set-col(0, @col) }, 'can set a col from an array';
   is-deeply $m1.get-col(0), (^3)».Num.flat.Array, 'set col';
-}, 'get & set rows & columns';
+};
 
-subtest {
+subtest 'exchange rows & columns' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(4));
   $m1.set-row(0, ^4);
   $m1.set-row(1, 4..7);
@@ -168,9 +168,9 @@ subtest {
   my Math::Libgsl::Matrix $m5 .= new(:size1(4), :size2(4));
   lives-ok { $m5.transpose-tricpy($m4, CblasUpper, CblasUnit) }, 'can tricpy and transpose';
   is-deeply ($m5.get-row($_) for ^4).flat, (0e0, 0e0, 0e0, 0e0, 1e0, 0e0, 0e0, 0e0, 1e0, 1e0, 0e0, 0e0, 1e0, 1e0, 1e0, 0e0), 'tricpy and transpose matrix';
-}, 'exchange rows & columns';
+};
 
-subtest {
+subtest 'matrix operations' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   my Math::Libgsl::Matrix $m2 .= new(:size1(3), :size2(3));
   $m1.set-row($_, ^3) for ^3;
@@ -198,9 +198,9 @@ subtest {
     $m1.scale-columns($v1);
     is-deeply ($m1.get-row($_) for ^3).flat, (0e0, 1e0, 4e0, 0e0, 1e0, 4e0, 0e0, 1e0, 4e0).flat, 'can scale-columns';
   }
-}, 'matrix operations';
+};
 
-subtest {
+subtest 'matrix min & max' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   $m1.set-row(0, ^3);
   $m1.set-row(1, 3..5);
@@ -211,9 +211,9 @@ subtest {
   is-deeply $m1.max-index, (2, 2), 'index of max element';
   is-deeply $m1.min-index, (0, 0), 'index of min element';
   is-deeply $m1.minmax-index, (0, 0, 2, 2), 'index of min & max elements';
-}, 'matrix min & max';
+};
 
-subtest {
+subtest 'matrix properties' => {
   my Math::Libgsl::Matrix $m1 .= new(:size1(3), :size2(3));
   ok $m1.is-null, 'all elements are 0';
   $m1.setall(2e0);
@@ -229,6 +229,41 @@ subtest {
     $m1.setall(2);
     ok $m1.norm1 == 6, 'matrix 1-norm';
   }
-}, 'matrix properties';
+};
+
+subtest 'matrix to list' => {
+  my Math::Libgsl::Matrix $m .= new(:size1(3), :size2(3)).identity;
+  is-deeply $m.list».Int, ((1, 0, 0), (0, 1, 0), (0, 0, 1)), 'list method coerces to a List of Lists';
+  my @l = $m.list;
+  is-deeply @l».Int, [(1, 0, 0), (0, 1, 0), (0, 0, 1)], 'assign a matrix to a Raku array';
+};
+
+subtest 'gist & put' => {
+  my Math::Libgsl::Matrix $m .= new(:size1(200), :size2(200)).identity;
+
+  for ^200 X ^200 -> ($i, $j) {
+    $m[$i;$j] = $j + $i * 200;
+  }
+
+  ok $m.gist eq '(' ~ do for ^10 -> $i { '(' ~ ((^10) »+» ($i * 200)).join(' ') ~ " ...)\n" } ~ "...)",
+    'gist returns the first 10 elements of the first 10 rows';
+
+  sub capture_stdout(Callable $code) {
+    my $result;
+    my $*OUT = class {
+      method print(*@args) {
+        $result ~= @args.join;
+      }
+      method flush {}
+    }
+    $code.();
+    $result;
+  }
+
+  my $out = capture_stdout({ $m.put });
+  ok $out eq (^40000).join(' ') ~ "\n", 'method put';
+  $out = capture_stdout({ put $m });
+  ok $out eq (^40000).join(' ') ~ "\n", 'sub put';
+};
 
 done-testing;

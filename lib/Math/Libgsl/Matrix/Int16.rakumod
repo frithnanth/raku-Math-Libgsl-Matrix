@@ -48,6 +48,30 @@ submethod BUILD(Int :$size1?, Int :$size2?, gsl_matrix_short :$matrix?) {
 submethod DESTROY {
   gsl_matrix_short_free($!matrix) unless $!view;
 }
+
+multi method list(Math::Libgsl::Matrix::Int16: --> List) {
+  my gsl_vector_short $v = gsl_vector_short_calloc($!matrix.size2);
+  LEAVE { gsl_vector_short_free($v) }
+
+  do for ^$!matrix.size1 {
+    gsl_matrix_short_get_row($v, $!matrix, $_);
+    (^$v.size).map( { gsl_vector_short_get($v, $_) } ).eager;
+  }
+}
+multi method gist(Math::Libgsl::Matrix::Int16: --> Str) {
+  my ($size1, $ellip1) = $!matrix.size1 > 10 ?? (10, ' ...') !! ($!matrix.size1, '');
+  my ($size2, $ellip2) = $!matrix.size2 > 10 ?? (10, '...')  !! ($!matrix.size2, '');
+
+  my gsl_vector_short $v = gsl_vector_short_calloc($!matrix.size2);
+  LEAVE { gsl_vector_short_free($v) }
+
+  '(' ~
+  do for ^$size1 {
+    gsl_matrix_short_get_row($v, $!matrix, $_);
+    '(' ~ (^$size2).map({ gsl_vector_short_get($v, $_) }).Str ~ "$ellip1)\n";
+  } ~ "$ellip2)"
+}
+multi method Str(Math::Libgsl::Matrix::Int16: --> Str) { self.list.join(' ') }
 # Accessors
 method get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num) {
   gsl_matrix_short_get($!matrix, $i, $j)

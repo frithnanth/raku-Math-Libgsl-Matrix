@@ -48,6 +48,30 @@ submethod BUILD(Int :$size1?, Int :$size2?, gsl_matrix_float :$matrix?) {
 submethod DESTROY {
   gsl_matrix_float_free($!matrix) unless $!view;
 }
+
+multi method list(Math::Libgsl::Matrix::Num32: --> List) {
+  my gsl_vector_float $v = gsl_vector_float_calloc($!matrix.size2);
+  LEAVE { gsl_vector_float_free($v) }
+
+  do for ^$!matrix.size1 {
+    gsl_matrix_float_get_row($v, $!matrix, $_);
+    (^$v.size).map( { gsl_vector_float_get($v, $_) } ).eager;
+  }
+}
+multi method gist(Math::Libgsl::Matrix::Num32: --> Str) {
+  my ($size1, $ellip1) = $!matrix.size1 > 10 ?? (10, ' ...') !! ($!matrix.size1, '');
+  my ($size2, $ellip2) = $!matrix.size2 > 10 ?? (10, '...')  !! ($!matrix.size2, '');
+
+  my gsl_vector_float $v = gsl_vector_float_calloc($!matrix.size2);
+  LEAVE { gsl_vector_float_free($v) }
+
+  '(' ~
+  do for ^$size1 {
+    gsl_matrix_float_get_row($v, $!matrix, $_);
+    '(' ~ (^$size2).map({ gsl_vector_float_get($v, $_) }).Str ~ "$ellip1)\n";
+  } ~ "$ellip2)"
+}
+multi method Str(Math::Libgsl::Matrix::Num32: --> Str) { self.list.join(' ') }
 # Accessors
 method get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Num) {
   gsl_matrix_float_get($!matrix, $i, $j)

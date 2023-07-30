@@ -49,6 +49,32 @@ submethod BUILD(Int :$size1?, Int :$size2?, gsl_matrix_complex :$matrix?) {
 submethod DESTROY {
   gsl_matrix_complex_free($!matrix) unless $!view;
 }
+
+multi method list(Math::Libgsl::Matrix::Complex64: --> List) {
+  my gsl_vector_complex $v = gsl_vector_complex_calloc($!matrix.size2);
+  my $c = alloc_gsl_complex;
+  LEAVE { gsl_vector_complex_free($v); free_gsl_complex($c) }
+
+  do for ^$!matrix.size1 {
+    gsl_matrix_complex_get_row($v, $!matrix, $_);
+    (^$v.size).map( { mgsl_vector_complex_get($v, $_, $c); $c.dat[0] + $c.dat[1] * i } ).eager;
+  }
+}
+multi method gist(Math::Libgsl::Matrix::Complex64: --> Str) {
+  my ($size1, $ellip1) = $!matrix.size1 > 10 ?? (10, ' ...') !! ($!matrix.size1, '');
+  my ($size2, $ellip2) = $!matrix.size2 > 10 ?? (10, '...')  !! ($!matrix.size2, '');
+
+  my gsl_vector_complex $v = gsl_vector_complex_calloc($!matrix.size2);
+  my $c = alloc_gsl_complex;
+  LEAVE { gsl_vector_complex_free($v); free_gsl_complex($c) }
+
+  '(' ~
+  do for ^$size1 {
+    gsl_matrix_complex_get_row($v, $!matrix, $_);
+    '(' ~ (^$size2).map({ mgsl_vector_complex_get($v, $_, $c); $c.dat[0] + $c.dat[1] * i }).Str ~ "$ellip1)\n";
+  } ~ "$ellip2)"
+}
+multi method Str(Math::Libgsl::Matrix::Complex64: --> Str) { self.list.join(' ') }
 # Accessors
 method get(Int:D $i! where * < $!matrix.size1, Int:D $j! where * < $!matrix.size2 --> Complex) {
   my $res = alloc_gsl_complex;
