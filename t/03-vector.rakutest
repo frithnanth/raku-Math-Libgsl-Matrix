@@ -6,16 +6,16 @@ use Math::Libgsl::Vector;
 use Math::Libgsl::Vector::Complex64 ();
 use Math::Libgsl::Constants;
 
-subtest {
+subtest 'vector allocation' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   isa-ok $v1, Math::Libgsl::Vector, 'new using pair';
   ok $v1.vector.size == 10, 'size directly';
   ok $v1.size == 10, 'size through method';
   my Math::Libgsl::Vector $v2 .= new(10);
   isa-ok $v2, Math::Libgsl::Vector, 'new using single value';
-}, 'vector allocation';
+};
 
-subtest {
+subtest 'vector set & get' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   ok $v1.get(0) == 0, 'get element';
   dies-ok { $v1.get(10) }, 'get element 11 of a 10-element vector dies';
@@ -34,9 +34,9 @@ subtest {
   lives-ok { $v1.basis(1) }, 'basis';
   is-deeply $v1[^10], (0e0, 1e0, 0e0 xx 8).flat, 'basis vector';
   dies-ok { $v1.basis(10) }, 'basis 11 of a 10-element vector dies';
-}, 'vector set & get';
+};
 
-subtest {
+subtest 'vector IO' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.setall(1);
   my $filename = 't/vector.dat';
@@ -45,9 +45,9 @@ subtest {
   lives-ok { $v1.read($filename) }, 'can read a vector from file';
   lives-ok { $v1.printf($filename, "%3.1lf") }, 'can print a vector to file';
   is-deeply $filename.IO.lines, '1.0' xx 10, 'vector file';
-}, 'vector IO';
+};
 
-subtest {
+subtest 'views' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.setall(1);
   my Math::Libgsl::Vector $vv1;
@@ -100,9 +100,9 @@ subtest {
   is-deeply $v[^10], (2e0, |(1e0 xx 9)), 'alias array view as an anomymous sub';
   array-stride-vec(-> $vec { $v = $vec; $v[0] = 2 }, 2, @array);
   is-deeply $v[^5], (2e0, |(1e0 xx 4)), 'array view with stride as a closure';
-}, 'views';
+};
 
-subtest {
+subtest 'vector copy' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.set($_, $_.Num) for ^10;
   my Math::Libgsl::Vector $v2 .= new(:size(10));
@@ -114,9 +114,9 @@ subtest {
   lives-ok { $v1.swap($v2) }, 'can swap';
   is-deeply $v1[^10], (0e0 xx 10), 'swap';
   dies-ok { $v3.swap($v1) }, "can't swap different sized vectors";
-}, 'vector copy';
+};
 
-subtest {
+subtest 'element exchange' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.set($_, $_.Num) for ^10;
   lives-ok { $v1.swap-elems(0, 1) }, 'can exchange elements';
@@ -125,9 +125,9 @@ subtest {
   $v1.set($_, $_.Num) for ^10;
   lives-ok { $v1.reverse }, 'can reverse elements';
   is-deeply $v1[^10], (9e0…0e0).flat, 'reverse elements';
-}, 'element exchange';
+};
 
-subtest {
+subtest 'vector operations' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.setall(4);
   my Math::Libgsl::Vector $v2 .= new(:size(10));
@@ -154,9 +154,9 @@ subtest {
     lives-ok { $v1.axpby(2e0, 3e0, $v2) }, 'can compute αx + βy';
     is-deeply $v2[^10], (26e0 xx 10), 'axpby';
   }
-}, 'vector operations';
+};
 
-subtest {
+subtest 'vector min & max' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   $v1.set($_, $_.Num) for ^10;
   ok $v1.max == 9e0, 'max element';
@@ -165,9 +165,9 @@ subtest {
   ok $v1.max-index == 9, 'index of max element';
   ok $v1.min-index == 0, 'index of min element';
   is-deeply $v1.minmax-index, (0, 9), 'index of min & max elements';
-}, 'vector min & max';
+};
 
-subtest {
+subtest 'vector properties' => {
   my Math::Libgsl::Vector $v1 .= new(:size(10));
   ok $v1.is-null, 'all elements of v are 0';
   $v1.setall(2e0);
@@ -179,6 +179,38 @@ subtest {
   my Math::Libgsl::Vector $v2 .= new(:size(10));
   $v2.setall(-2e0);
   ok $v1.is-equal($v2), 'two vectors are equal';
-}, 'vector properties';
+};
+
+subtest 'vector to list' => {
+  my Math::Libgsl::Vector $v .= new(:size(10));
+  $v[$_] = $_ for ^10;
+  is-deeply $v.list, (^10)».Num,       'list method coerces to a List';
+  is-deeply $v[*],   (^10)».Num,       'AT-POS method coerces to a List';
+  my @a = $v[*];
+  is-deeply @a,      (^10)».Num.Array, 'assign a vector to a Raku array';
+};
+
+subtest 'gist & put' => {
+  my Math::Libgsl::Vector $v .= new(:size(200));
+  $v[$_] = $_ for ^200;
+  ok $v.gist eq '(' ~ (^100).join(' ') ~ ' ...)', 'gist returns the first 100 elements';
+
+  sub capture_stdout(Callable $code) {
+    my $result;
+    my $*OUT = class {
+      method print(*@args) {
+        $result ~= @args.join;
+      }
+      method flush {}
+    }
+    $code.();
+    $result;
+  }
+
+  my $out = capture_stdout({ $v.put });
+  ok $out eq (^200).join(' ') ~ "\n", 'method put';
+  $out = capture_stdout({ put $v });
+  ok $out eq (^200).join(' ') ~ "\n", 'sub put';
+}
 
 done-testing;
