@@ -1,6 +1,8 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+
+0.6.1  2024-02-05T11:39:09Z
     - Drop the obsolete .absolute call :-)
 
 0.6.0  2023-07-30T18:46:22+01:00
