@@ -6,7 +6,7 @@ use Math::Libgsl::Raw::Complex :ALL;
 use Math::Libgsl::Raw::Matrix::Num32;
 use NativeCall;
 
-constant GSLHELPER = %?RESOURCES<libraries/gslhelper>.absolute;
+constant GSLHELPER = %?RESOURCES<libraries/gslhelper>;
 
 sub LIB {
   run('/sbin/ldconfig', '-p', :chomp, :out).out.slurp(:close).split("\n").grep(/^ \s+ libgsl\.so\. \d+ /).sort.head.comb(/\S+/).head;

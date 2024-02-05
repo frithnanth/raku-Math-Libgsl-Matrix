@@ -4,7 +4,7 @@ unit module Math::Libgsl::Raw::Matrix:ver<0.6.0>:auth<zef:FRITH>;
 
 use NativeCall;
 
-constant GSLHELPER = %?RESOURCES<libraries/gslhelper>.absolute;
+constant GSLHELPER = %?RESOURCES<libraries/gslhelper>;
 
 sub LIB {
   run('/sbin/ldconfig', '-p', :chomp, :out)

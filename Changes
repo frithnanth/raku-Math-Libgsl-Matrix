@@ -1,6 +1,7 @@
 Revision history for Math-Libgsl-Matrix
 
 {{$NEXT}}
+    - Drop the obsolete .absolute call :-)
 
 0.6.0  2023-07-30T18:46:22+01:00
     - Add .list .gist .Str to Vector and Matrix classes
